@@ -15,7 +15,12 @@ public:
   DistanceMetric determineBestDistanceMetric(const std::vector<CensusData> & census_data);
 
 private:
-  void initPopulation();
+  std::vector<DistanceMetric> initPopulation();
+  std::vector<DistanceMetric> select(const std::vector<DistanceMetric> & population);
+  void crossover(std::vector<DistanceMetric> &population);
+  void mutate(std::vector<DistanceMetric> &population);
+  double eval(std::vector<DistanceMetric> &population, const std::vector<CensusData> & census_data);
+  double eval(DistanceMetric &distance_metric, const std::vector<CensusData> & census_data);
 
   const int population_size_;
   const int tournament_size_;
