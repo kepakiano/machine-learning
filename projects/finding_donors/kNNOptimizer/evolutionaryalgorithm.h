@@ -16,6 +16,7 @@ public:
 
 private:
   std::vector<DistanceMetric> initPopulation();
+  DistanceMetric tournamentSelection(const std::vector<DistanceMetric> & population);
   std::vector<DistanceMetric> select(const std::vector<DistanceMetric> & population);
   void crossover(std::vector<DistanceMetric> &population);
   void mutate(std::vector<DistanceMetric> &population);
@@ -29,7 +30,7 @@ private:
   const bool elite_selection_;
 
   int generation_count_;
-  static constexpr int max_generations_ = 50;
+  static constexpr int max_generations_ = 100;
 };
 
 #endif // EVOLUTIONARYALGORITHM_H

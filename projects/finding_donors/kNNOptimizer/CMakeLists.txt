@@ -14,7 +14,7 @@ else()
 endif()
 
 INCLUDE_DIRECTORIES(
-  ../../../../../../utilities
+  ../../../../utilities
 )
 
 add_executable(${PROJECT_NAME} ${SRC_LIST})

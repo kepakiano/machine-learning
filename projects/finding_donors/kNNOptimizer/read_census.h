@@ -27,6 +27,7 @@ std::vector<CensusData> read_census()
   std::string next_line_features;
   std::string next_line_labels;
   bool first_line = true;
+  size_t i = 0;
   while(std::getline(census_features_file, next_line_features)){
     std::vector<std::string> tokenized_features_line = Utilities::IO::splitString(next_line_features, ',');
 
@@ -57,8 +58,11 @@ std::vector<CensusData> read_census()
       bool earns_more_than_50k = tokenized_labels_line.at(1) == "1";
       census_data.push_back(CensusData(features, earns_more_than_50k));
     }
+    if(++i == 100)
+        break;
 
   }
+  std::cout << census_data.size() << std::endl;
   return census_data;
 }
 
