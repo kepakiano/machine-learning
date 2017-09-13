@@ -18,6 +18,7 @@ class LearningAgent(Agent):
         self.Q = dict()          # Create a Q-table which will be a dictionary of tuples
         self.epsilon = epsilon   # Random exploration factor
         self.alpha = alpha       # Learning factor
+        self.gamma = 0.0
 
         ###########
         ## TO DO ##
@@ -111,10 +112,9 @@ class LearningAgent(Agent):
         # Otherwise, choose an action with the highest Q-value for the current state
         # Be sure that when choosing an action with highest Q-value that you randomly select between actions that "tie".
         if not self.learning or random.random() < self.epsilon:
-            action = self.valid_actions[random.randint(0, len(self.valid_actions)-1)]
+            action = random.choice(self.valid_actions)
         else:
-            best_actions = self.get_best_actions(state)
-            action = best_actions[random.randint(0, len(best_actions)-1)]
+            action = random.choice(self.get_best_actions(state))
             
         return action
 
@@ -131,11 +131,10 @@ class LearningAgent(Agent):
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
         Q_st_at = self.Q[state][action]
         r_t = reward
-        max_a = self.get_maxQ(state)
 
-        self.Q[state][action] = Q_st_at + self.alpha * (r_t + max_a - Q_st_at)
-        return
-
+        if self.learning:
+            self.Q[state][action] = Q_st_at + self.alpha * (r_t - Q_st_at)
+        
 
     def update(self):
         """ The update function is called when a time step is completed in the 
@@ -184,7 +183,7 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env, update_delay=0.001, log_metrics=True, optimized=True)
+    sim = Simulator(env, update_delay=0.0001, log_metrics=True, optimized=True)
     
     ##############
     # Run the simulator
