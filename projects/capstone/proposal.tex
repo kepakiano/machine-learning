@@ -66,7 +66,7 @@ The inputs the algorithm can make use of are the following:
  \item Space station health: Every time an asteroid is allowed to cross the screen, the space station will lose a set amount of health and regenerate it at a fixed rate until it's back at 100 again. If the space station health drops below $0$, the player will lose the game.
  \item Asteroids: Set of x- and y-coordinates describing the positions of the asteroids
  \item Ship position: The ship can move left and right on the lower corner of the screen
- \item Shots left: Only a certain amount of shots can be fired at a time.
+ \item Weapons array cooldown: A certain amount of time needs to have passed between shots.
  \item Shot positions: Set of x- and y-coordinates of the shots the player has already fired.
 \end{itemize}
 
@@ -95,9 +95,13 @@ The result will be an agent that has explored a big portion of the state space a
 % 
 % In this section, provide the details for a benchmark model or result that relates to the domain, problem statement, and intended solution. Ideally, the benchmark model or result contextualizes existing methods or known information in the domain and problem given, which could then be objectively compared to the solution. Describe how the benchmark model or result is measurable (can be measured by some metric and clearly observed) with thorough detail.
 
-Since the agent will train on a custom game, the choice of benchmark models and solutions to compare the performance to is sparse:
-
-
+Since the agent will train on a custom game, the choice of benchmark models and solutions to compare the performance to is sparse.
+Two options will be taken into consideration:
+\begin{itemize}
+ \item A few human players will play the game several times each. 
+ \item A computer agent will execute random actions.
+\end{itemize}
+Ŵe will record the distribution of the scores from both groups.
 
 % Since the agent will train on a custom game, there does not exist a benchmark yet which its performance can be compared to.
 % However, it is possible to objectively measure the effectiveness of the agent's actions and how it improves  over time:
@@ -107,10 +111,49 @@ Since the agent will train on a custom game, the choice of benchmark models and 
 \section{Evalution Metrics}
 % (approx. 1-2 paragraphs)
 % 
+The automated agent will be implemented as described in the solution model and compared to the approaches from the benchmark model.
+The two options in the benchmark model will yield two sets of scores which will be used to evaluate the performance of the trained agent.
+It is expected that the human players will perform significantly better than the random agent.
+Therefore, the goal of the automated agent is to reach a score that is closer to the distribution of human players.
+If its performance remains at the level of the random agent, the approach will be considered a failure.
 % In this section, propose at least one evaluation metric that can be used to quantify the performance of both the benchmark model and the solution model. The evaluation metric(s) you propose should be appropriate given the context of the data, the problem statement, and the intended solution. Describe how the evaluation metric(s) are derived and provide an example of their mathematical representations (if applicable). Complex evaluation metrics should be clearly defined and quantifiable (can be expressed in mathematical or logical terms).
 \section{Project Design}
 % (approx. 1 page)
 % 
+So far, the project is a single player game without the option for a computer program to interact with it.
+The first thing to do is therefore to omplement an interface to the computer agent. 
+The interface needs to provide the agent with everything it needs:
+\begin{itemize}
+ \item A list of possible actions 
+ \item A desription of the state of the environment
+\end{itemize}
+After that interface has been impemented, the random action agent can be tested.
+
+Like the reinforcement learning project this project needs an option to be executed without a graphical interface.
+If the state of the system needed to be rendered after every timestep, training an automated agent would not be feasable.
+To make sure that the results from the training are applicable to the real game, we will set a fixed framerate of 60 frames per second.
+After these additions, a reinforcement learning agent can start training.
+
+The biggest challenge of this project will be finding ways of reducing the size of the state space without losing too much valuable information.
+Things that contribute to the state of the environment are:
+\begin{itemize}
+ \item Position of the ship
+ \item Position of asteroids
+ \item Position of shots
+ \item Health of the ship
+ \item Health of the space station 
+ \item Cooldown of the weapons array
+\end{itemize}
+
+If the state space is too big, the agent will never be able to exploit knowledge from previous runs, because it will never reach states that have already been observed.
+
+As in the reinforcement learning project from earlier we will work with different values for the exploration factor in the Q-learning setup.
+This time, we will also use different values for the discount factor $\gamma$, because striving for future rewards is exactly what this project is about: We want to find out whether crashing the ship into an asteroid and thus taking a short-term punishment can be worth it in the long run.
+
+The final result will be a set of states and associated rewards that the agent has learned.
+We will be able to start the game with the graphical interface and to choose the agent to play the game which will then do so to the best of its abilities.
+
+
 % In this final section, summarize a theoretical workflow for approaching a solution given the problem. Provide thorough discussion for what strategies you may consider employing, what analysis of the data might be required before being used, or which algorithms will be considered for your implementation. The workflow and discussion that you provide should align with the qualities of the previous sections. Additionally, you are encouraged to include small visualizations, pseudocode, or diagrams to aid in describing the project design, but it is not required. The discussion should clearly outline your intended workflow of the capstone project.
 
 
