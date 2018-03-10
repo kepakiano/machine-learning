@@ -10,12 +10,12 @@ CPlayer::CPlayer(){
 void CPlayer::Init(){
 	m_pSpritePlayer = new CSprite;
   
-	m_pSpritePlayer->Load("Player.png",11,64,64);
+    m_pSpritePlayer->Load("../assets/Player.png",11,64,64);
 	m_pSpritePlayer->SetColorKey(255,0,255);
   
 	m_pSpriteShot = new CSprite;
   
-	m_pSpriteShot->Load("Laser.png",0,64,64);
+    m_pSpriteShot->Load("../assets/Laser.png",0,64,64);
 	m_pSpriteShot->SetColorKey(255,0,255);
 	m_CurShots = 0;
 	m_Score = 0;

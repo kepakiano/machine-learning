@@ -64,14 +64,14 @@ void CGame::Init(){
 	m_pPlayer->Reset();
 
 	m_pSpriteBackground = new CSprite;
-	m_pSpriteBackground->Load("Background.png");
+    m_pSpriteBackground->Load("../assets/Background.png");
 	
 	m_pSpriteExplosion = new CSprite;
-	m_pSpriteExplosion->Load("explosion3.png", 25, 64, 64);
+    m_pSpriteExplosion->Load("../assets/explosion3.png", 25, 64, 64);
  	m_pSpriteExplosion->SetColorKey(0,0,0);
 	
 	m_pSpriteAsteroid = new CSprite;
-	m_pSpriteAsteroid->Load("Asteroid.png", 20, 64, 64);
+    m_pSpriteAsteroid->Load("../assets/Asteroid.png", 20, 64, 64);
 	m_pSpriteAsteroid->SetColorKey(255,0,255);
   
 	m_fAsteroidTimer = 0.0f;

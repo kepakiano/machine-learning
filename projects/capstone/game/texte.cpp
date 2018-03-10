@@ -11,7 +11,7 @@ CText::CText(int x, int y, int size){
 	m_pScreen = g_pFramework->GetScreen();
 	offset.x = x;
 	offset.y = y;
-	font = TTF_OpenFont("ethnocent.ttf", size);
+    font = TTF_OpenFont("../assets/ethnocent.ttf", size);
 	TextTimer = 0.0f;
 }
 
@@ -22,7 +22,7 @@ CText::CText(string str, int x, int y, int size){
 	offset.x = x;
 	offset.y = y;
 	text = str;
-	font = TTF_OpenFont("ethnocent.ttf", size);
+    font = TTF_OpenFont("../assets/ethnocent.ttf", size);
 	TextTimer = 0.0f;
 	SDL_Color TextFarbe = {40,240,40};
 	fertig = TTF_RenderText_Solid(font, const_cast<char*>(str.c_str()), TextFarbe);
