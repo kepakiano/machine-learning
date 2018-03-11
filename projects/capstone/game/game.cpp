@@ -9,7 +9,8 @@
 
 using namespace std;
 
-CGame::CGame(){
+CGame::CGame(const int screen_width, const int screen_height)
+    : screen_width(screen_width), screen_height(screen_height), num_distinct_spawnpoints(8){
 	m_pPlayer = NULL;
 	m_pSpriteBackground = NULL;
 	m_pSpriteAsteroid = NULL;
@@ -227,8 +228,12 @@ void CGame::SpawnAsteroids(){
   
 	if(m_fAsteroidTimer >= m_SpawnTime){
 		CAsteroid Asteroid;
-    
-		int XPos = ((SDL_GetTicks()+rand())*(m_pPlayer->GetScore()+1))%736;
+
+        const int asteroid_width = 64;
+        const int space_between_spawnpoints = screen_width / num_distinct_spawnpoints;
+        const int leftmost_position = space_between_spawnpoints - asteroid_width / 2;
+        // The width of one asteroid is 64 pixels. We want their mids to spawn at x-position 50, 100... etc
+        int XPos = leftmost_position + (((SDL_GetTicks()+rand())*(m_pPlayer->GetScore()+1))%num_distinct_spawnpoints) * space_between_spawnpoints;
 		Asteroid.Init(m_pSpriteAsteroid, static_cast<float>(XPos), -60.0f, m_SpeedAsteroid);
     
 		m_AsteroidList.push_back(Asteroid);
@@ -248,7 +253,7 @@ void CGame::CheckCollisions(){
 		RectAsteroid = ItAsteroid->GetRect();
 //      		cout << "Beginn while-Schleife" << endl;
 
-		// Trifft ein Asteroid das Schiff?
+        // Does an asteroid hit the ship?
 		if(m_fSpawnSchutz > 3.0f && RectAsteroid.y > 466 &&
 			RectAsteroid.x + 64 - 10 > m_pPlayer->GetXPosition() &&
 			RectAsteroid.x < (m_pPlayer->GetXPosition() + 54))

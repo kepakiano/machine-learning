@@ -2,10 +2,12 @@
 #include "game.hpp"
 
 int main(int argc, char *argv[]){
-	if(g_pFramework->Init(800,600,16,false) == false)
+    const int screen_width = 800;
+    const int screen_height = 600;
+    if(g_pFramework->Init(screen_width, screen_height,16,false) == false)
 		return 0;
   
-	CGame Game;
+    CGame Game(screen_height, screen_width);
   
 	Game.Init();
 	Game.Menu();

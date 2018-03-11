@@ -9,10 +9,10 @@
 
 class CGame{
 	public:
-		CGame();
+        CGame(const int screen_width, const int screen_height);
     
 		void Menu();
-		void Init();
+        void Init();
 		void Run();
 		void GameOver();
 		void Quit();
@@ -114,7 +114,12 @@ class CGame{
 		int m_punkte;
 		int m_AlterHighscore;
 		bool m_bNewHighscore;
+
+        const int screen_width;
+        const int screen_height;
 		
+        const int num_distinct_spawnpoints;
+
 		CText *m_pVersion;
 };
 #endif
