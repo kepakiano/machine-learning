@@ -79,8 +79,8 @@ void CPlayer::RenderShots(bool pause){
 
 void CPlayer::Update(){
 	m_LebensenergieTimer += g_pTimer->GetElapsed();
-	ProcessMoving();
-	ProcessShooting();
+    Action action = getAction();
+    ProcessAction(action);
 	CheckPosition();
 	
 	if(m_Lebensenergie_Raumstation < 100 && m_LebensenergieTimer > m_RegenRaumstation){
@@ -93,12 +93,12 @@ void CPlayer::Update(){
 	*/
 } // Update
 
-void CPlayer::ProcessMoving(){
-	if(g_pFramework->KeyDown(SDLK_LEFT)){
+void CPlayer::ProcessAction(const Action &action){
+    if(action == MOVE_LEFT){
 		m_fXPos -= 300.0f *g_pTimer->GetElapsed();
 		m_fAnimPhase -= 20.0f *g_pTimer->GetElapsed();
 	}
-	else if (g_pFramework->KeyDown(SDLK_RIGHT)){
+    else if (action == MOVE_RIGHT){
 		m_fXPos += 300.0f * g_pTimer->GetElapsed();
 		m_fAnimPhase -= -20.0f * g_pTimer -> GetElapsed();
 	}
@@ -108,24 +108,17 @@ void CPlayer::ProcessMoving(){
 		if (m_fAnimPhase < 5.0f)
 			m_fAnimPhase += 20.0f * g_pTimer->GetElapsed();
 	}
-} // ProcessMoving
-
-void CPlayer::ProcessShooting(){
-//   cout << "Schüsse aktuell: " << m_CurShots << endl;
-	if (g_pFramework->KeyDown(SDLK_SPACE) && m_bShotLock == false && m_CurShots < m_MaxShots){
+    if (action == SHOOT){
 		CShot Shot;
     
 		Shot.Init(m_pSpriteShot, m_fXPos, m_fYPos);
     
 		m_ShotList.push_back(Shot);
     
-		m_bShotLock = true;
+        m_bShotLock = true;
     
 		m_CurShots++;
 	}
-  
-	if(g_pFramework->KeyDown(SDLK_SPACE) == false)
-		m_bShotLock = false;
 } // ProcessShooting
 
 void CPlayer::CheckPosition(){

@@ -7,6 +7,8 @@
 #include <fstream>
 #include <cmath>
 
+#include "humanplayer.h"
+
 using namespace std;
 
 CGame::CGame(const int screen_width, const int screen_height)
@@ -60,7 +62,7 @@ void CGame::Init(){
 	m_pBruchpilot = new CText("1. Bruchpilot", 210, 290, 15);
 	m_pDurchschnittstyp = new CText("2. Durchschnittstyp", 210, 320, 15);
 	m_pEliteFlieger = new CText("3. Elite-Flieger", 210, 350, 15);
-	m_pPlayer = new CPlayer;
+    m_pPlayer = new HumanPlayer();
 	m_pPlayer->Init();
 	m_pPlayer->Reset();
 
@@ -156,7 +158,7 @@ void CGame::Run(){
 		
  			SpawnAsteroids();
 		
-    			CheckCollisions();
+            CheckCollisions();
 
   			UpdateTexts();
  			RenderTexts();

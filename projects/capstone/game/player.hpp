@@ -6,6 +6,13 @@
 #include "sprite.hpp"
 #include "shot.hpp"
 
+enum Action{
+    MOVE_RIGHT,
+    MOVE_LEFT,
+    SHOOT,
+    PASS
+};
+
 class CPlayer{
 	public:
 		CPlayer	();
@@ -28,10 +35,16 @@ class CPlayer{
 		void Raumstation_Getroffen();
 		void DecreaseShots();
 		int BerechnePunkte(int Asteroiden_Hoehe);
+
+    protected:
+        virtual Action getAction() = 0;
+        unsigned int m_MaxShots;
+        bool m_bShotLock;
+        unsigned int m_CurShots;
 		
-	private:
-		void ProcessMoving();
-		void ProcessShooting();
+    private:
+
+        void ProcessAction(const Action &action);
 		void CheckPosition();
     
 		CSprite *m_pSpritePlayer;
@@ -43,16 +56,13 @@ class CPlayer{
 		
 		 // Variablen für den Schwierigkeitsgrad
 		int m_DmgRaumstation;
-		int m_Score;
-		unsigned int m_MaxShots;
+        int m_Score;
 		float m_RegenRaumstation;
 		
-		
-		unsigned int m_CurShots;
+
 		unsigned int m_Leben;
 		unsigned int m_Lebensenergie_Raumstation;
-		
-		bool m_bShotLock;
+
 		list<CShot> m_ShotList;
 };
 

@@ -23,7 +23,7 @@ class CGame{
 		void SpawnAsteroids	();
 		void SpawnExplosion	(int x, int y, float speed);
 		void SpawnScore		(int punkte, int x, int y);
-		void RenderAsteroids	(bool pause);
+        void RenderAsteroids(bool pause);
 		void RenderSpieler	();
 		void RenderExplosions	();
 		void RenderNewHighscore	();
