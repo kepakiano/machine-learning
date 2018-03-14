@@ -11,7 +11,7 @@ Action HumanPlayer::getAction()
 {
     if(g_pFramework->KeyDown(SDLK_SPACE) == false)
             m_bShotLock = false;
-    if (g_pFramework->KeyDown(SDLK_SPACE) && m_bShotLock == false && m_CurShots < m_MaxShots)
+    if (g_pFramework->KeyDown(SDLK_SPACE) && m_bShotLock == false && isShootingPossible())
         return Action::SHOOT;
     if(g_pFramework->KeyDown(SDLK_LEFT))
         return Action::MOVE_LEFT;

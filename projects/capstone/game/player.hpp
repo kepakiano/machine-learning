@@ -38,6 +38,9 @@ class CPlayer{
 
     protected:
         virtual Action getAction() = 0;
+        bool isShootingPossible(){
+            return m_CurShots < m_MaxShots;
+        }
         unsigned int m_MaxShots;
         bool m_bShotLock;
         unsigned int m_CurShots;

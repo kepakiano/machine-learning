@@ -8,6 +8,8 @@
 #include <cmath>
 
 #include "humanplayer.h"
+#include "randomplayer.h"
+#include "utilities.hpp"
 
 using namespace std;
 
@@ -62,7 +64,7 @@ void CGame::Init(){
 	m_pBruchpilot = new CText("1. Bruchpilot", 210, 290, 15);
 	m_pDurchschnittstyp = new CText("2. Durchschnittstyp", 210, 320, 15);
 	m_pEliteFlieger = new CText("3. Elite-Flieger", 210, 350, 15);
-    m_pPlayer = new HumanPlayer();
+    m_pPlayer = new RandomPlayer();
 	m_pPlayer->Init();
 	m_pPlayer->Reset();
 
@@ -144,7 +146,7 @@ void CGame::Run(){
 		
 		g_pFramework->Clear();
 		
-    		m_pSpriteBackground->Render();
+        m_pSpriteBackground->Render();
 		
  		RenderExplosions();
 		
@@ -235,7 +237,7 @@ void CGame::SpawnAsteroids(){
         const int space_between_spawnpoints = screen_width / num_distinct_spawnpoints;
         const int leftmost_position = space_between_spawnpoints - asteroid_width / 2;
         // The width of one asteroid is 64 pixels. We want their mids to spawn at x-position 50, 100... etc
-        int XPos = leftmost_position + (((SDL_GetTicks()+rand())*(m_pPlayer->GetScore()+1))%num_distinct_spawnpoints) * space_between_spawnpoints;
+        int XPos = leftmost_position + getRandomNumberBetween(0, num_distinct_spawnpoints) * space_between_spawnpoints;
 		Asteroid.Init(m_pSpriteAsteroid, static_cast<float>(XPos), -60.0f, m_SpeedAsteroid);
     
 		m_AsteroidList.push_back(Asteroid);
