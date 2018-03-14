@@ -18,12 +18,12 @@ class CPlayer{
 		CPlayer	();
 		void Init	();
 		void Quit	();
-		void Render	(bool pause);
-		void RenderShots(bool pause);
-		void Update	();
+        void Render	();
+        void UpdateShots(bool pause);
+        void Update	();
 		void Reset	();
-		list<CShot> *GetShotList(){
-			return &m_ShotList;
+        list<CShot>& GetShotList(){
+            return m_ShotList;
 		}
 	
 		int GetXPosition();
@@ -35,6 +35,12 @@ class CPlayer{
 		void Raumstation_Getroffen();
 		void DecreaseShots();
 		int BerechnePunkte(int Asteroiden_Hoehe);
+
+        bool shouldBeRendered(){
+            return m_fSpawnSchutz > 3.0f || m_fSpawnSchutzTimer > 0.25f;
+        }
+
+        float GetSpawnSchutz() const {return m_fSpawnSchutz;}
 
     protected:
         virtual Action getAction() = 0;
@@ -62,6 +68,8 @@ class CPlayer{
         int m_Score;
 		float m_RegenRaumstation;
 		
+        float m_fSpawnSchutz;
+        float m_fSpawnSchutzTimer;
 
 		unsigned int m_Leben;
 		unsigned int m_Lebensenergie_Raumstation;

@@ -9,7 +9,7 @@ public:
     HumanPlayer();
 
 protected:
-    Action getAction() override;
+    virtual Action getAction() override;
 };
 
 #endif // HUMANPLAYER_H

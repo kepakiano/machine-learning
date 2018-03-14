@@ -38,10 +38,10 @@ void CText::Update(int wert){
 }
 
 void CText::Update(float speed){
-	SDL_Color TextFarbe = {40,240,40};
-	offset.y -= speed * g_pTimer->GetElapsed();
-	transparency -= 300.0f * g_pTimer->GetElapsed();
- 	SDL_SetAlpha(fertig, SDL_SRCALPHA, transparency);
+    SDL_Color TextFarbe = {40,240,40};
+    offset.y -= speed * g_pTimer->GetElapsed();
+    transparency -= 300.0f * g_pTimer->GetElapsed();
+    SDL_SetAlpha(fertig, SDL_SRCALPHA, transparency);
 }
 
 void CText::Render(){

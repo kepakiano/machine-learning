@@ -1,31 +1,33 @@
 #ifndef SHOT_HPP
 #define SHOT_HPP
 
+#include "rectangle.hpp"
 #include "sprite.hpp"
 
 class CShot{
 	public:
-		void Init	(CSprite *pSpriteShot, float fXPos, float fYPos);
-		void Update	();
-		void Render	();
+        CShot(float fXPos, float fYPos);
+        void Update	();
     
-		bool IsAlive() {
+        bool IsAlive() const {
 			return m_bIsAlive;
 		}
     
 		void SetAlive(bool bIsAlive){
 			m_bIsAlive = bIsAlive;
 		}
+
+        float GetXPos() const {return m_fXPos;}
+        float GetYPos() const {return m_fYPos;}
 		
-		SDL_Rect GetRect(){
+        Rectangle GetRect() const {
 			return m_Rect;
 		}
     
-	private:
-		CSprite *m_pSpriteShot;
+    private:
 		float m_fXPos;
 		float m_fYPos;
 		bool m_bIsAlive;
-		SDL_Rect m_Rect;
+        Rectangle m_Rect;
 };
 #endif

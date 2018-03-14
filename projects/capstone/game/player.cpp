@@ -2,9 +2,12 @@
 #include "player.hpp"
 
 
-CPlayer::CPlayer(){
-	m_pSpritePlayer = NULL;
-	m_pSpriteShot = NULL;
+CPlayer::CPlayer()
+    : m_fSpawnSchutz(3.0f)
+    , m_fSpawnSchutzTimer(0.0f)
+    , m_pSpritePlayer(nullptr)
+    , m_pSpriteShot(nullptr)
+{
 }
 
 void CPlayer::Init(){
@@ -14,14 +17,15 @@ void CPlayer::Init(){
 	m_pSpritePlayer->SetColorKey(255,0,255);
   
 	m_pSpriteShot = new CSprite;
-  
-    m_pSpriteShot->Load("../assets/Laser.png",0,64,64);
-	m_pSpriteShot->SetColorKey(255,0,255);
+
 	m_CurShots = 0;
 	m_Score = 0;
 
 	m_Lebensenergie_Raumstation = 100;
 	m_LebensenergieTimer = 0.0f;
+
+    m_fSpawnSchutz = 0.0f;
+    m_fSpawnSchutzTimer = 0.0f;
 } // Init
 
 void CPlayer::SetWerte(int leben, int max_schuesse, int dmg_raumstation, float regen_raumstation){
@@ -51,23 +55,25 @@ void CPlayer::Reset(){
 	m_Leben--;
   
 	m_bShotLock = false;
+    m_fSpawnSchutz = 0.0f;
+    m_fSpawnSchutzTimer = 0.0f;
 } // Reset
 
-void CPlayer::Render(bool pause){
+void CPlayer::Render(){
 	m_pSpritePlayer->SetPos(m_fXPos, m_fYPos);
 	m_pSpritePlayer->Render(m_fAnimPhase);
 } // Render
 
-void CPlayer::RenderShots(bool pause){
+
+void CPlayer::UpdateShots(bool game_is_paused){
 	list<CShot>::iterator it = m_ShotList.begin();
 	m_CurShots = 0;
 	while(it != m_ShotList.end()){
 			
-		if(pause == false)
+        if(game_is_paused == false)
 			it->Update();
     		
-		if(it->IsAlive()){
-			it->Render();
+        if(it->IsAlive()){
 			it++;
 			m_CurShots++;
 		}
@@ -78,7 +84,14 @@ void CPlayer::RenderShots(bool pause){
 } // RenderShots
 
 void CPlayer::Update(){
+
 	m_LebensenergieTimer += g_pTimer->GetElapsed();
+    m_fSpawnSchutzTimer += g_pTimer->GetElapsed();
+    m_fSpawnSchutz += g_pTimer->GetElapsed();
+
+    if(m_fSpawnSchutzTimer > 0.5f)
+        m_fSpawnSchutzTimer = 0.0f;
+
     Action action = getAction();
     ProcessAction(action);
 	CheckPosition();
@@ -86,12 +99,8 @@ void CPlayer::Update(){
 	if(m_Lebensenergie_Raumstation < 100 && m_LebensenergieTimer > m_RegenRaumstation){
 		m_Lebensenergie_Raumstation++;
 		m_LebensenergieTimer = 0.0f;
-	}
-	/*
-	if(m_Lebensenergie_Raumstation > 100)
-		m_Lebensenergie_Raumstation = 100;
-	*/
-} // Update
+    }
+}
 
 void CPlayer::ProcessAction(const Action &action){
     if(action == MOVE_LEFT){
@@ -109,11 +118,10 @@ void CPlayer::ProcessAction(const Action &action){
 			m_fAnimPhase += 20.0f * g_pTimer->GetElapsed();
 	}
     if (action == SHOOT){
-		CShot Shot;
     
-		Shot.Init(m_pSpriteShot, m_fXPos, m_fYPos);
+        CShot shot(m_fXPos, m_fYPos);
     
-		m_ShotList.push_back(Shot);
+        m_ShotList.push_back(shot);
     
         m_bShotLock = true;
     

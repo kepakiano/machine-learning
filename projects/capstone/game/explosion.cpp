@@ -1,15 +1,14 @@
 //  explosion.cpp
 #include "explosion.hpp"
 
-void CExplosion::Init(CSprite *pSpriteExplosion, float fXPos, float fYPos, float speed){
-	m_pSpriteExplosion = pSpriteExplosion;
+void CExplosion::Init(float fXPos, float fYPos, float speed){
 	m_fXPos = fXPos;
 	m_fYPos = fYPos;
   
 	m_Rect.x = static_cast<int>(fXPos);
 	m_Rect.y = static_cast<int>(fYPos);
-	m_Rect.w = pSpriteExplosion->GetRect().w;
-	m_Rect.h = pSpriteExplosion->GetRect().h;
+    m_Rect.w = 64;
+    m_Rect.h = 64;
 	m_speed = speed;
 	m_fAnimPhase = 0.0f;
   

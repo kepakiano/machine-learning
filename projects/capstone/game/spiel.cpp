@@ -10,7 +10,6 @@ int main(int argc, char *argv[]){
     CGame Game(screen_height, screen_width);
   
 	Game.Init();
-	Game.Menu();
   
 	Game.Run();
 	Game.GameOver();

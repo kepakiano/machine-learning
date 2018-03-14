@@ -5,7 +5,7 @@
 
 class CExplosion{
 	public:
-		void Init	(CSprite *pSpriteExplosion, float fXPos, float fYPos, float speed);
+        void Init	( float fXPos, float fYPos, float speed);
 		void Update	();
 		void Render	();
     
@@ -20,6 +20,10 @@ class CExplosion{
 		SDL_Rect GetRect(){
 			return m_Rect;
 		}
+
+        float GetXPos() const {return m_fXPos;}
+        float GetYPos() const {return m_fYPos;}
+        float GetAnimPhase() const {return m_fAnimPhase;}
     
 	private:
 		CSprite *m_pSpriteExplosion;

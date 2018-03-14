@@ -2,7 +2,6 @@
 #define TEXTE_HPP
 
 #include "SDL/SDL_ttf.h"
-#include "framework.hpp"
 #include <string>
 
 using namespace std;
