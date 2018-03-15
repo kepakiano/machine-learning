@@ -15,7 +15,6 @@ public:
 
     virtual int GetDifficultyLevel() override;
     virtual void Init() override;
-//    virtual void Run() override;
     virtual void GameOver(const bool is_new_highscore, const int lives_left, const int score, const int old_highscore) override;
     virtual void Quit() override;
 
@@ -25,7 +24,7 @@ public:
     virtual void RenderFrame(const std::list<CAsteroid> &asteroids,
                              const list<CExplosion> &explosions,
                              CPlayer *player,
-                             const bool game_is_paused) override;
+                             const bool game_is_paused, const double seconds) override;
     virtual GameEvent ProcessEvents() override;
 
 
@@ -33,16 +32,16 @@ public:
 
 
     virtual void setFramesPerSecond(float fps) override {
-        m_pFramesPerSecond->Update(int(fps));
+        m_pFramesPerSecond->UpdateString(int(fps));
     }
 
 private:
     void RenderAsteroids(const std::list<CAsteroid> &asteroids);
     void RenderExplosions(const list<CExplosion> &explosions);
-    void RenderPause	();
+    void RenderPause	(const double seconds);
     void RenderPlayer(CPlayer *player);
 
-    void UpdateTexts	(CPlayer *player);
+    void UpdateTexts	(CPlayer *player, const double seconds);
     void RenderTexts	();
     void RenderNewHighscore	();
 

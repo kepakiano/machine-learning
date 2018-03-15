@@ -6,7 +6,7 @@ bool CFramework::Init(int ScreenWidth, int ScreenHeight, int ColorDepth, bool bF
 		cout << "SDL konnte nicht initialisiert werden!" << endl;
 		cout << "Fehlermeldung: " << SDL_GetError() << endl;
 		Quit();
-		return (false);
+        return false;
 	}
 	
 	if (bFullscreen == true)
@@ -18,20 +18,19 @@ bool CFramework::Init(int ScreenWidth, int ScreenHeight, int ColorDepth, bool bF
 		cout << "Videomodus konnte nicht gesetzt werden!" << endl;
 		cout << "Fehlermeldung: " << SDL_GetError() << endl;
 		Quit();
-		return (false);
+        return false;
 	}
   
 	m_pKeystate = SDL_GetKeyState(NULL);
   
-	return (true);
+    return true;
 } // Init
 
 void CFramework::Quit(){
 	SDL_Quit();
 } // Quit
 
-void CFramework::Update(){ 
-	g_pTimer->Update();
+void CFramework::Update(){
 	SDL_PumpEvents();
 } // Update
 

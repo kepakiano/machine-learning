@@ -19,8 +19,8 @@ class CPlayer{
 		void Init	();
 		void Quit	();
         void Render	();
-        void UpdateShots(bool pause);
-        void Update	();
+        void UpdateShots(bool pause, const double seconds);
+        void Update	(const double seconds);
 		void Reset	();
         list<CShot>& GetShotList(){
             return m_ShotList;
@@ -53,7 +53,7 @@ class CPlayer{
 		
     private:
 
-        void ProcessAction(const Action &action);
+        void ProcessAction(const Action &action, const double seconds);
 		void CheckPosition();
     
 		CSprite *m_pSpritePlayer;

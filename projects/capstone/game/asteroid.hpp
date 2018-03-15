@@ -8,7 +8,7 @@
 class CAsteroid{
 	public:
         CAsteroid(float fXPos, float fYPos, float speed);
-        void Update	(bool pause);
+        void Update	(const bool pause, const double seconds);
     
 		bool IsAlive(){
 			return m_bIsAlive;

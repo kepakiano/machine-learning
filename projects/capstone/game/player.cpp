@@ -65,13 +65,14 @@ void CPlayer::Render(){
 } // Render
 
 
-void CPlayer::UpdateShots(bool game_is_paused){
+void CPlayer::UpdateShots(bool game_is_paused,
+                          const double seconds){
 	list<CShot>::iterator it = m_ShotList.begin();
 	m_CurShots = 0;
 	while(it != m_ShotList.end()){
 			
         if(game_is_paused == false)
-			it->Update();
+            it->Update(seconds);
     		
         if(it->IsAlive()){
 			it++;
@@ -83,17 +84,16 @@ void CPlayer::UpdateShots(bool game_is_paused){
 	}
 } // RenderShots
 
-void CPlayer::Update(){
-
-	m_LebensenergieTimer += g_pTimer->GetElapsed();
-    m_fSpawnSchutzTimer += g_pTimer->GetElapsed();
-    m_fSpawnSchutz += g_pTimer->GetElapsed();
+void CPlayer::Update(const double seconds){
+    m_LebensenergieTimer += seconds;
+    m_fSpawnSchutzTimer += seconds;
+    m_fSpawnSchutz += seconds;
 
     if(m_fSpawnSchutzTimer > 0.5f)
         m_fSpawnSchutzTimer = 0.0f;
 
     Action action = getAction();
-    ProcessAction(action);
+    ProcessAction(action, seconds);
 	CheckPosition();
 	
 	if(m_Lebensenergie_Raumstation < 100 && m_LebensenergieTimer > m_RegenRaumstation){
@@ -102,20 +102,20 @@ void CPlayer::Update(){
     }
 }
 
-void CPlayer::ProcessAction(const Action &action){
+void CPlayer::ProcessAction(const Action &action, const double seconds){
     if(action == MOVE_LEFT){
-		m_fXPos -= 300.0f *g_pTimer->GetElapsed();
-		m_fAnimPhase -= 20.0f *g_pTimer->GetElapsed();
+        m_fXPos -= 300.0f * seconds;
+        m_fAnimPhase -= 20.0f * seconds;
 	}
     else if (action == MOVE_RIGHT){
-		m_fXPos += 300.0f * g_pTimer->GetElapsed();
-		m_fAnimPhase -= -20.0f * g_pTimer -> GetElapsed();
+        m_fXPos += 300.0f * seconds;
+        m_fAnimPhase -= -20.0f * seconds;
 	}
 	else {
 		if (m_fAnimPhase > 5.0f)
-			m_fAnimPhase -= 20.0f * g_pTimer->GetElapsed();
+            m_fAnimPhase -= 20.0f * seconds;
 		if (m_fAnimPhase < 5.0f)
-			m_fAnimPhase += 20.0f * g_pTimer->GetElapsed();
+            m_fAnimPhase += 20.0f * seconds;
 	}
     if (action == SHOOT){
     

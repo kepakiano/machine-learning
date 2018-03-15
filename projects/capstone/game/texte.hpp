@@ -11,8 +11,8 @@ class CText{
 		CText(int x, int y, int size);
 		CText(string str, int x, int y, int size);
 		~CText();
-		void Update(int wert);
-		void Update(float speed);
+        void UpdateString(int wert);
+        void Update(float speed, const double seconds);
 		void Render();
 		
 		int GetTransparency(){

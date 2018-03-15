@@ -73,5 +73,6 @@ class CGame{
 		
         const int num_distinct_spawnpoints;
 
+
 };
 #endif

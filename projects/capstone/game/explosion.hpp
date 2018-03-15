@@ -6,7 +6,7 @@
 class CExplosion{
 	public:
         void Init	( float fXPos, float fYPos, float speed);
-		void Update	();
+        void Update	(const double seconds);
 		void Render	();
     
 		bool IsAlive() {

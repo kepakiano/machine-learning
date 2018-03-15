@@ -6,6 +6,7 @@
 #include <cstring>
 #include <fstream>
 #include <cmath>
+#include <thread>
 
 #include "gameevents.hpp"
 #include "humanplayer.h"
@@ -56,6 +57,11 @@ void CGame::Quit(){
 
 void CGame::Run(){
 	while(m_bGameRun == true && m_pPlayer->GetLeben() > 0 && m_pPlayer->GetLebensenergie_Raumstation() > 0){
+        g_pTimer->Update();
+        auto start_of_frame = std::chrono::high_resolution_clock::now();
+
+        std::cout << g_pTimer->GetElapsed() << std::endl;
+
         GameEvent game_event = renderer->ProcessEvents();
 
         if(game_event == END_GAME)
@@ -66,11 +72,11 @@ void CGame::Run(){
   		FramesPerSecond();		
 		
         UpdateExplosions();
-        m_pPlayer->UpdateShots(m_bPause);
+        m_pPlayer->UpdateShots(m_bPause, g_pTimer->GetElapsed());
         UpdateAsteroids(m_bPause);
 
 		if(m_bPause == false){
- 			m_pPlayer->Update();
+            m_pPlayer->Update(g_pTimer->GetElapsed());
  			SpawnAsteroids();
             CheckCollisions();
         }
@@ -78,8 +84,10 @@ void CGame::Run(){
         renderer->RenderFrame(m_AsteroidList,
                               m_ExplosionList,
                               m_pPlayer,
-                              m_bPause);
+                              m_bPause,
+                              g_pTimer->GetElapsed());
 
+        g_pTimer->sleepForRestOfFrame(start_of_frame);
     }
 }
 
@@ -163,7 +171,7 @@ void CGame::CheckCollisions(){
 
 void CGame::UpdateAsteroids(bool pause){
     for(CAsteroid &asteroid : m_AsteroidList)
-        asteroid.Update(pause);
+        asteroid.Update(pause, g_pTimer->GetElapsed());
 }
 
 void CGame::UpdateExplosions(){
@@ -172,7 +180,7 @@ void CGame::UpdateExplosions(){
 	while(It != m_ExplosionList.end()){
 		if(It->IsAlive()){
 			if(m_bPause == false)
-				It->Update();
+                It->Update(g_pTimer->GetElapsed());
 			It++;
 		}
 		else
@@ -184,7 +192,7 @@ void CGame::UpdateExplosions(){
 
 void CGame::FramesPerSecond(){
 	frames++;
-    fps = (frames*1000) / (g_pTimer->GetStartTime() - g_pTimer->GetCurTime()).count();
+    fps = (frames*1000000000.f) / (g_pTimer->GetCurTime() - g_pTimer->GetStartTime()).count();
 
     renderer->setFramesPerSecond(fps);
 } // FramesPerSecond
@@ -228,8 +236,6 @@ void CGame::SpawnExplosion(int x, int y, float speed){
 	m_ExplosionList.push_back(Explosion);
 	m_fExplosionTimer = 0.0f;
 }
-
-
 
 bool CGame::NewHighscore(){
 	ifstream Alt("Highscore.txt", ios::in);

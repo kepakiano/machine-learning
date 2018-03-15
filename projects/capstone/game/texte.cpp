@@ -28,19 +28,20 @@ CText::CText(string str, int x, int y, int size){
 	fertig = TTF_RenderText_Solid(font, const_cast<char*>(str.c_str()), TextFarbe);
 }
 
-void CText::Update(int wert){
-		ostringstream temp;
-		temp << wert;
-		m_komplett = temp.str();
-		char* hinne_jetz = const_cast<char*>(m_komplett.c_str());
-  		SDL_Color TextFarbe = {40,240,40};
-		fertig = TTF_RenderText_Solid(font, hinne_jetz, TextFarbe);
+void CText::UpdateString(int wert){
+    ostringstream temp;
+    temp << wert;
+    m_komplett = temp.str();
+    char* hinne_jetz = const_cast<char*>(m_komplett.c_str());
+    SDL_Color TextFarbe = {40,240,40};
+    fertig = TTF_RenderText_Solid(font, hinne_jetz, TextFarbe);
 }
 
-void CText::Update(float speed){
+void CText::Update(float speed,
+                   const double seconds){
     SDL_Color TextFarbe = {40,240,40};
-    offset.y -= speed * g_pTimer->GetElapsed();
-    transparency -= 300.0f * g_pTimer->GetElapsed();
+    offset.y -= speed * seconds;
+    transparency -= 300.0f * seconds;
     SDL_SetAlpha(fertig, SDL_SRCALPHA, transparency);
 }
 

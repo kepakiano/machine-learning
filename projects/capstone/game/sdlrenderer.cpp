@@ -100,19 +100,20 @@ void SdlRenderer::Quit(){
 void SdlRenderer::RenderFrame(const std::list<CAsteroid> &asteroids,
                               const list<CExplosion> &explosions,
                               CPlayer *player,
-                              const bool game_is_paused){
+                              const bool game_is_paused,
+                              const double seconds){
     g_pFramework->Update();
     g_pFramework->Clear();
+    m_pSpriteBackground->Render();
     if(showFPS)
         m_pFramesPerSecond->Render();
-    m_pSpriteBackground->Render();
     if(game_is_paused){
-        RenderPause();
+        RenderPause(seconds);
     }
     else{
         RenderAsteroids(asteroids);
         RenderExplosions(explosions);
-        UpdateTexts(player);
+        UpdateTexts(player, seconds);
         RenderTexts();
         RenderPlayer(player);
     }
@@ -135,8 +136,8 @@ void SdlRenderer::RenderExplosions(const list<CExplosion> &explosions){
     }
 }
 
-void SdlRenderer::RenderPause(){
-    m_fPauseTimer += g_pTimer->GetElapsed();
+void SdlRenderer::RenderPause(const double seconds){
+    m_fPauseTimer += seconds;
     // Wenn das Spiel pausiert ist, wird der Schriftzug PAUSE jeweils für 0,4 Sekunden gezeigt
     if(m_fPauseTimer > 0.4f){
         m_pPauseText->Render();
@@ -194,20 +195,21 @@ void SdlRenderer::handleGameEvent(GameEvent game_event)
 }
 
 
-void SdlRenderer::UpdateTexts(CPlayer *player){
+void SdlRenderer::UpdateTexts(CPlayer *player,
+                              const double seconds){
     // Lebensenergie der Raumstation updaten?
     if(m_UpdateLebensenergie == true)
-        m_pLebensenergie->Update(player->GetLebensenergie_Raumstation());
+        m_pLebensenergie->UpdateString(player->GetLebensenergie_Raumstation());
 
     // Leben updaten?
     if(m_UpdateLeben == true){
-        m_pLeben->Update(player->GetLeben());
+        m_pLeben->UpdateString(player->GetLeben());
         m_UpdateLeben = false;
     }
 
     // Score updaten?
     if(m_UpdateScore == true){
-        m_pScore->Update(player->GetScore());
+        m_pScore->UpdateString(player->GetScore());
         m_UpdateScore = false;
     }
 
@@ -222,7 +224,7 @@ void SdlRenderer::UpdateTexts(CPlayer *player){
         if(ItText->GetTransparency() < 20.0f)
             ItText = m_TextList.erase(ItText);
         else {
-            ItText->Update(3.0f);
+            ItText->Update(3.0f, seconds);
             ItText->Render();
             ItText++;
         }
@@ -244,33 +246,31 @@ void SdlRenderer::GameOver(const bool is_new_highscore,
                            const int lives_left,
                            const int score,
                            const int old_highscore){
-    float drei_sekunden = 0.0f;
-    while(drei_sekunden < 3.0f){
-        g_pFramework->Clear();
-        m_pSpriteBackground->Render();
-        if(lives_left == 0)
-            m_pGameOver = new CText("Du hast all deine Leben verloren!", 210,300, 15);
-        else
-            m_pGameOver = new CText("Die Raumstation wurde vernichtet!", 210,300, 15);
+    g_pFramework->Clear();
+    m_pSpriteBackground->Render();
+    if(lives_left == 0)
+        m_pGameOver = new CText("Du hast all deine Leben verloren!", 210,300, 15);
+    else
+        m_pGameOver = new CText("Die Raumstation wurde vernichtet!", 210,300, 15);
 
-        if(is_new_highscore){
-            m_pNewHighscoreText1 = new CText("Du hast einen neuen Highscore erreicht!", 210, 350, 15);
-            m_pOldHighscoreText = new CText("Alter Highscore: ", 210, 380, 15);
-            m_pOldHighscore = new CText(440, 380, 15);
-            m_pNewHighscoreText2 = new CText("Neuer Highscore: ", 210, 410, 15);
-            m_pNewHighscore = new CText(440, 410, 15);
+    if(is_new_highscore){
+        m_pNewHighscoreText1 = new CText("Du hast einen neuen Highscore erreicht!", 210, 350, 15);
+        m_pOldHighscoreText = new CText("Alter Highscore: ", 210, 380, 15);
+        m_pOldHighscore = new CText(440, 380, 15);
+        m_pNewHighscoreText2 = new CText("Neuer Highscore: ", 210, 410, 15);
+        m_pNewHighscore = new CText(440, 410, 15);
 
-            m_pNewHighscore->Update(score);
-            m_pOldHighscore->Update(old_highscore);
-            RenderNewHighscore();
-        }
-        m_pGameOver->Render();
-        m_pHighscoreText->Render();
-        m_pHighscore->Update(score);
-        m_pHighscore->Render();
-        g_pFramework->Flip();
-        drei_sekunden += g_pTimer->GetElapsed();
+        m_pNewHighscore->UpdateString(score);
+        m_pOldHighscore->UpdateString(old_highscore);
+        RenderNewHighscore();
     }
+    m_pGameOver->Render();
+    m_pHighscoreText->Render();
+    m_pHighscore->UpdateString(score);
+    m_pHighscore->Render();
+    g_pFramework->Flip();
+
+    std::this_thread::sleep_for(std::chrono::seconds(3));
 }
 
 void SdlRenderer::RenderNewHighscore(){

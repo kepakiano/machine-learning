@@ -3,7 +3,9 @@
 CTimer::CTimer()
     : start(std::chrono::high_resolution_clock::now())
     , m_fCurTime(std::chrono::high_resolution_clock::now())
-    , m_fLastTime(std::chrono::high_resolution_clock::now()){
+    , m_fLastTime(std::chrono::high_resolution_clock::now())
+    , target_fps(60)
+    , target_frame_duration(int(1000./60)){
 
     m_fElapsed = m_fCurTime - m_fLastTime;
 }

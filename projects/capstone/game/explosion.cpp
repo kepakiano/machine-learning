@@ -15,11 +15,11 @@ void CExplosion::Init(float fXPos, float fYPos, float speed){
 	m_bIsAlive = true;
 }
 
-void CExplosion::Update(){
-    m_fYPos += m_speed * g_pTimer->GetElapsed();
+void CExplosion::Update(const double seconds){
+    m_fYPos += m_speed * seconds;
   
 	m_Rect.y = static_cast<int>(m_fYPos);
-    m_fAnimPhase += 60.0f *g_pTimer->GetElapsed();
+    m_fAnimPhase += 60.0f * seconds;
   
 	if(m_fYPos < -15.0f || m_fAnimPhase > 25.0f){
  		m_bIsAlive = false;

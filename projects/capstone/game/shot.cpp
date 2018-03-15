@@ -9,8 +9,8 @@ CShot::CShot(float fXPos, float fYPos)
 	m_bIsAlive = true;
 }
 
-void CShot::Update(){
-	m_fYPos -= 400.0f * g_pTimer->GetElapsed();
+void CShot::Update(const double seconds){
+    m_fYPos -= 400.0f * seconds;
   
 	m_Rect.y = static_cast<int>(m_fYPos);
   

@@ -7,7 +7,7 @@
 class CShot{
 	public:
         CShot(float fXPos, float fYPos);
-        void Update	();
+        void Update	(const double seconds);
     
         bool IsAlive() const {
 			return m_bIsAlive;

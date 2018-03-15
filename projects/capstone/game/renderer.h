@@ -25,7 +25,8 @@ public:
     virtual void RenderFrame(const std::list<CAsteroid> &asteroids,
                              const list<CExplosion> &explosions,
                              CPlayer *player,
-                             const bool game_is_paused) = 0;
+                             const bool game_is_paused,
+                             const double seconds) = 0;
     virtual GameEvent ProcessEvents() = 0;
     virtual void handleGameEvent(GameEvent game_event) = 0;
 
