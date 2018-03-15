@@ -55,7 +55,6 @@ void CGame::Quit(){
 } // Quit
 
 void CGame::Run(){
-	m_fStartRunTime = g_pTimer->GetCurTime();
 	while(m_bGameRun == true && m_pPlayer->GetLeben() > 0 && m_pPlayer->GetLebensenergie_Raumstation() > 0){
         GameEvent game_event = renderer->ProcessEvents();
 
@@ -94,7 +93,7 @@ void CGame::GameOver()
 } // Run
 
 void CGame::SpawnAsteroids(){
-	m_fAsteroidTimer += g_pTimer->GetElapsed();
+    m_fAsteroidTimer += g_pTimer->GetElapsed();
   
     if(m_fAsteroidTimer >= m_SpawnTime){
 
@@ -185,7 +184,7 @@ void CGame::UpdateExplosions(){
 
 void CGame::FramesPerSecond(){
 	frames++;
-	fps = (frames*1000) / (SDL_GetTicks() - m_fStartRunTime);
+    fps = (frames*1000) / (g_pTimer->GetStartTime() - g_pTimer->GetCurTime()).count();
 
     renderer->setFramesPerSecond(fps);
 } // FramesPerSecond

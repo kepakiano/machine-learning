@@ -1,7 +1,8 @@
 #ifndef TIMER_HPP
 #define TIMER_HPP
 
-// #include <SDL.h>
+#include <chrono>
+
 #include "SDL/SDL.h"
 #include "singleton.hpp"
 
@@ -12,17 +13,22 @@ class CTimer : public TSingleton<CTimer>{
 	
 		void Update();
     
-		float GetElapsed(){
-			return m_fElapsed;
+        auto GetElapsed(){
+            return m_fElapsed.count();
 		}
 		
-		int GetCurTime(){
-			return (int)m_fCurTime;
-		}
+        auto GetCurTime(){
+            return m_fCurTime;
+        }
+
+        auto GetStartTime(){
+            return start;
+        }
       
 	private:
-		float m_fElapsed;
-		float m_fCurTime;
-		float m_fLastTime;
+        std::chrono::high_resolution_clock::time_point start;
+        std::chrono::duration<double, std::ratio<1>> m_fElapsed;
+        std::chrono::high_resolution_clock::time_point m_fCurTime;
+        std::chrono::high_resolution_clock::time_point m_fLastTime;
 };
 #endif

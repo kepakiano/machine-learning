@@ -19,7 +19,7 @@ void CAsteroid::Update(bool pause){
         m_fYPos += m_speed *g_pTimer->GetElapsed();
         rectangle.y = m_fYPos;
 	}
-	m_fAnimPhase += 10.0f *g_pTimer->GetElapsed();
+    m_fAnimPhase += 10.0f *g_pTimer->GetElapsed();
   
 	if(m_fAnimPhase >= 20.0f)
 		m_fAnimPhase = m_fAnimPhase - 20.0f;
