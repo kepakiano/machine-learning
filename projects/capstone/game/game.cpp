@@ -14,6 +14,7 @@
 #include "sdlrenderer.h"
 #include "sdl_timer.hpp"
 #include "fake_timer.hpp"
+#include "fake_renderer.hpp"
 #include "utilities.hpp"
 
 using namespace std;
@@ -21,10 +22,12 @@ using namespace std;
 CGame::CGame(const int screen_width, const int screen_height)
     : screen_width(screen_width), screen_height(screen_height), num_distinct_spawnpoints(8){
     m_pPlayer = NULL;
-    renderer = new SdlRenderer();
-    m_pTimer = new SdlTimer();
-}
+//    renderer = new SdlRenderer(screen_width, screen_height);
+//    m_pTimer = new SdlTimer();
 
+    renderer = new FakeRenderer();
+    m_pTimer = new FakeTimer();
+}
 
 void CGame::Init(){
     renderer->Init();

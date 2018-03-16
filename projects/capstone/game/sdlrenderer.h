@@ -11,7 +11,7 @@
 class SdlRenderer : public Renderer
 {
 public:
-    SdlRenderer();
+    SdlRenderer(int screen_width, int screen_height);
 
     virtual int GetDifficultyLevel() override;
     virtual void Init() override;
@@ -97,6 +97,8 @@ private:
 
     float m_fPauseTimer;
     CText *m_pVersion;
+
+    const int screen_width, screen_height;
 };
 
 #endif // SDLRENDERER_H

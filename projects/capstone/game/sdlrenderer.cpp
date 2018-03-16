@@ -2,10 +2,12 @@
 
 #include <thread>
 
-SdlRenderer::SdlRenderer()
+SdlRenderer::SdlRenderer(int screen_width, int screen_height)
     : m_pSpriteBackground(nullptr)
     , m_pSpriteAsteroid(nullptr)
     , m_fPauseTimer(0.0f)
+    , screen_width(screen_width)
+    , screen_height(screen_height)
 {
 
 }
@@ -38,6 +40,10 @@ int SdlRenderer::GetDifficultyLevel(){
 
 
 void SdlRenderer::Init(){
+    if(g_pFramework->Init(screen_width, screen_height,16,false) == false){
+        std::cerr << "Could not initialize SDL framework" << std::endl;
+        return;
+    }
     TTF_Init();
 
     m_pWaehle = new CText("Wie gut fliegst du?", 210, 260, 15);

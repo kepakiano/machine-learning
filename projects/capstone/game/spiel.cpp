@@ -4,10 +4,8 @@
 int main(int argc, char *argv[]){
     const int screen_width = 800;
     const int screen_height = 600;
-    if(g_pFramework->Init(screen_width, screen_height,16,false) == false)
-		return 0;
   
-    CGame Game(screen_height, screen_width);
+    CGame Game(screen_width, screen_height);
   
 	Game.Init();
   
