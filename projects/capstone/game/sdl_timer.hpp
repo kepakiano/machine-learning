@@ -25,8 +25,6 @@ public:
         m_fLastTime = m_fCurTime;
     }
 
-
-
     double GetElapsed(){
         return m_fElapsed.count();
     }

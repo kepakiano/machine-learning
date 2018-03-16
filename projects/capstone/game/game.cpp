@@ -13,6 +13,7 @@
 #include "randomplayer.h"
 #include "sdlrenderer.h"
 #include "sdl_timer.hpp"
+#include "fake_timer.hpp"
 #include "utilities.hpp"
 
 using namespace std;
@@ -202,6 +203,7 @@ void CGame::togglePause(){
 } // toggleFPS
 
 void CGame::SetDifficultyLevel(int schwierigkeitsgrad){
+    this->schwierigkeitsgrad = schwierigkeitsgrad;
 	if(schwierigkeitsgrad == 1){
 		m_SpeedAsteroid = 150.0f;
 		m_DmgRaumstation = 12;

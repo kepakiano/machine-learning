@@ -24,7 +24,6 @@ add_executable(AsteroidsReinformentLearning asteroid.cpp
     spiel.cpp
     sprite.cpp
     texte.cpp
-    timer.cpp
 )
 
 target_include_directories(AsteroidsReinformentLearning
