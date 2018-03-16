@@ -7,6 +7,7 @@
 #include "asteroid.hpp"
 #include "explosion.hpp"
 #include "renderer.h"
+#include "timer.hpp"
 
 class CGame{
 	public:
@@ -46,7 +47,8 @@ class CGame{
 		float m_SpeedAsteroid;
 
 		CPlayer *m_pPlayer;
-		
+        CTimer *m_pTimer;
+
 		float m_fAsteroidTimer;
 		float m_fExplosionTimer;
 

@@ -12,6 +12,7 @@
 #include "humanplayer.h"
 #include "randomplayer.h"
 #include "sdlrenderer.h"
+#include "sdl_timer.hpp"
 #include "utilities.hpp"
 
 using namespace std;
@@ -20,6 +21,7 @@ CGame::CGame(const int screen_width, const int screen_height)
     : screen_width(screen_width), screen_height(screen_height), num_distinct_spawnpoints(8){
     m_pPlayer = NULL;
     renderer = new SdlRenderer();
+    m_pTimer = new SdlTimer();
 }
 
 
@@ -57,10 +59,8 @@ void CGame::Quit(){
 
 void CGame::Run(){
 	while(m_bGameRun == true && m_pPlayer->GetLeben() > 0 && m_pPlayer->GetLebensenergie_Raumstation() > 0){
-        g_pTimer->Update();
+        m_pTimer->Update();
         auto start_of_frame = std::chrono::high_resolution_clock::now();
-
-        std::cout << g_pTimer->GetElapsed() << std::endl;
 
         GameEvent game_event = renderer->ProcessEvents();
 
@@ -72,11 +72,11 @@ void CGame::Run(){
   		FramesPerSecond();		
 		
         UpdateExplosions();
-        m_pPlayer->UpdateShots(m_bPause, g_pTimer->GetElapsed());
+        m_pPlayer->UpdateShots(m_bPause, m_pTimer->GetElapsed());
         UpdateAsteroids(m_bPause);
 
 		if(m_bPause == false){
-            m_pPlayer->Update(g_pTimer->GetElapsed());
+            m_pPlayer->Update(m_pTimer->GetElapsed());
  			SpawnAsteroids();
             CheckCollisions();
         }
@@ -85,9 +85,9 @@ void CGame::Run(){
                               m_ExplosionList,
                               m_pPlayer,
                               m_bPause,
-                              g_pTimer->GetElapsed());
+                              m_pTimer->GetElapsed());
 
-        g_pTimer->sleepForRestOfFrame(start_of_frame);
+        m_pTimer->sleepForRestOfFrame(start_of_frame);
     }
 }
 
@@ -101,7 +101,7 @@ void CGame::GameOver()
 } // Run
 
 void CGame::SpawnAsteroids(){
-    m_fAsteroidTimer += g_pTimer->GetElapsed();
+    m_fAsteroidTimer += m_pTimer->GetElapsed();
   
     if(m_fAsteroidTimer >= m_SpawnTime){
 
@@ -171,7 +171,7 @@ void CGame::CheckCollisions(){
 
 void CGame::UpdateAsteroids(bool pause){
     for(CAsteroid &asteroid : m_AsteroidList)
-        asteroid.Update(pause, g_pTimer->GetElapsed());
+        asteroid.Update(pause, m_pTimer->GetElapsed());
 }
 
 void CGame::UpdateExplosions(){
@@ -180,7 +180,7 @@ void CGame::UpdateExplosions(){
 	while(It != m_ExplosionList.end()){
 		if(It->IsAlive()){
 			if(m_bPause == false)
-                It->Update(g_pTimer->GetElapsed());
+                It->Update(m_pTimer->GetElapsed());
 			It++;
 		}
 		else
@@ -192,7 +192,7 @@ void CGame::UpdateExplosions(){
 
 void CGame::FramesPerSecond(){
 	frames++;
-    fps = (frames*1000000000.f) / (g_pTimer->GetCurTime() - g_pTimer->GetStartTime()).count();
+    fps = (frames*1000000000.f) / (m_pTimer->GetCurTime() - m_pTimer->GetStartTime()).count();
 
     renderer->setFramesPerSecond(fps);
 } // FramesPerSecond

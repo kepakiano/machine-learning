@@ -1,5 +1,7 @@
 #include "sdlrenderer.h"
 
+#include <thread>
+
 SdlRenderer::SdlRenderer()
     : m_pSpriteBackground(nullptr)
     , m_pSpriteAsteroid(nullptr)
