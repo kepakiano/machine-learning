@@ -62,6 +62,10 @@ void SdlRenderer::Init(){
     m_pSpriteAsteroid->Load("../assets/Asteroid.png", 20, 64, 64);
     m_pSpriteAsteroid->SetColorKey(255,0,255);
 
+    m_pSpritePlayer = new CSprite;
+    m_pSpritePlayer->Load("../assets/Player.png",11,64,64);
+    m_pSpritePlayer->SetColorKey(255,0,255);
+
     m_pSpriteShot = new CSprite;
     m_pSpriteShot->Load("../assets/Laser.png",0,64,64);
     m_pSpriteShot->SetColorKey(255,0,255);
@@ -155,8 +159,10 @@ void SdlRenderer::RenderPause(const double seconds){
 }
 
 void SdlRenderer::RenderPlayer(CPlayer *player){
-    if(player->shouldBeRendered())
-        player->Render();
+    if(player->shouldBeRendered()){
+        m_pSpritePlayer->SetPos(player->GetXPosition(), player->GetYPosition());
+        m_pSpritePlayer->Render(player->getAnimPhase());
+    }
 
     for(const CShot & shot : player->GetShotList()){
         if(shot.IsAlive()){

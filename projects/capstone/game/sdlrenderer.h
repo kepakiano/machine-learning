@@ -54,6 +54,7 @@ private:
     CSprite *m_pSpriteAsteroid;
     CSprite *m_pSpriteExplosion;
     CSprite *m_pSpriteShot;
+    CSprite *m_pSpritePlayer;
 
     CText *m_pFramesPerSecond;
 

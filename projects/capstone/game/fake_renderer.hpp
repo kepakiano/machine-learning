@@ -6,7 +6,7 @@
 #include "renderer.h"
 
 class FakeRenderer : public Renderer{
-    virtual int GetDifficultyLevel() override {return 1;}
+    virtual int GetDifficultyLevel() override {return 3;}
 
     virtual void Init() override {}
     virtual void GameOver(const bool is_new_highscore,

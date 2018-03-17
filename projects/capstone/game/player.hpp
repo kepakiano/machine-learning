@@ -17,23 +17,23 @@ class CPlayer{
 	public:
 		CPlayer	();
 		void Init	();
-		void Quit	();
-        void Render	();
+        void Quit	();
         void UpdateShots(bool pause, const double seconds);
         void Update	(const double seconds);
 		void Reset	();
         list<CShot>& GetShotList(){
             return m_ShotList;
 		}
-	
-		int GetXPosition();
+
+        int GetXPosition() const {return m_fXPos;}
+        int GetYPosition() const {return m_fYPos;}
+        float getAnimPhase() const {return m_fAnimPhase;}
 		int GetLeben();
 		int GetLebensenergie_Raumstation();
 		int GetScore();
 		
 		void SetWerte(int leben, int max_schuesse, int dmg_raumstation, float regen_raumstation);
-		void Raumstation_Getroffen();
-		void DecreaseShots();
+        void Raumstation_Getroffen();
 		int BerechnePunkte(int Asteroiden_Hoehe);
 
         bool shouldBeRendered(){
@@ -45,19 +45,16 @@ class CPlayer{
     protected:
         virtual Action getAction() = 0;
         bool isShootingPossible(){
-            return m_CurShots < m_MaxShots;
+            return m_ShotList.size() < m_MaxShots;
         }
         unsigned int m_MaxShots;
         bool m_bShotLock;
-        unsigned int m_CurShots;
 		
     private:
 
         void ProcessAction(const Action &action, const double seconds);
 		void CheckPosition();
-    
-		CSprite *m_pSpritePlayer;
-		CSprite *m_pSpriteShot;
+
 		float m_fXPos;
 		float m_fYPos;
 		float m_fAnimPhase;

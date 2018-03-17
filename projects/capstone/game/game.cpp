@@ -11,6 +11,7 @@
 #include "gameevents.hpp"
 #include "humanplayer.h"
 #include "randomplayer.h"
+#include "reinforcementlearningplayer.h"
 #include "sdlrenderer.h"
 #include "sdl_timer.hpp"
 #include "fake_timer.hpp"
@@ -22,11 +23,11 @@ using namespace std;
 CGame::CGame(const int screen_width, const int screen_height)
     : screen_width(screen_width), screen_height(screen_height), num_distinct_spawnpoints(8){
     m_pPlayer = NULL;
-//    renderer = new SdlRenderer(screen_width, screen_height);
-//    m_pTimer = new SdlTimer();
+    renderer = new SdlRenderer(screen_width, screen_height);
+    m_pTimer = new SdlTimer();
 
-    renderer = new FakeRenderer();
-    m_pTimer = new FakeTimer();
+//    renderer = new FakeRenderer();
+//    m_pTimer = new FakeTimer();
 }
 
 void CGame::Init(){
@@ -151,8 +152,7 @@ void CGame::CheckCollisions(){
 				RectShot.x + RectShot.w > RectAsteroid.x){
 				
 				ItAsteroid->SetAlive(false);
-				ItShot->SetAlive(false);
-				m_pPlayer->DecreaseShots();	
+                ItShot->SetAlive(false);
 				m_punkte = m_pPlayer->BerechnePunkte(RectAsteroid.y);
                 renderer->handleGameEvent(UPDATE_SCORE_TEXT);
 				SpawnExplosion(RectAsteroid.x, RectAsteroid.y, m_SpeedAsteroid/2.0f);
@@ -222,7 +222,6 @@ void CGame::SetDifficultyLevel(int schwierigkeitsgrad){
 		m_PlayerLeben = 6;
 		m_RegenRaumstation = 0.35f;
 		m_SpawnTime = 0.75f;
-		
 	}
 	else{
 		m_SpeedAsteroid = 200.0f;

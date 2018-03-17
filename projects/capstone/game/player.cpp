@@ -5,20 +5,10 @@
 CPlayer::CPlayer()
     : m_fSpawnSchutz(3.0f)
     , m_fSpawnSchutzTimer(0.0f)
-    , m_pSpritePlayer(nullptr)
-    , m_pSpriteShot(nullptr)
 {
 }
 
 void CPlayer::Init(){
-	m_pSpritePlayer = new CSprite;
-  
-    m_pSpritePlayer->Load("../assets/Player.png",11,64,64);
-	m_pSpritePlayer->SetColorKey(255,0,255);
-  
-	m_pSpriteShot = new CSprite;
-
-	m_CurShots = 0;
 	m_Score = 0;
 
 	m_Lebensenergie_Raumstation = 100;
@@ -36,14 +26,6 @@ void CPlayer::SetWerte(int leben, int max_schuesse, int dmg_raumstation, float r
 } // SetWerte
 
 void CPlayer::Quit(){
-	if(m_pSpritePlayer != NULL){
-		delete(m_pSpritePlayer);
-		m_pSpritePlayer = NULL;
-	}
-	if(m_pSpriteShot != NULL){
-		delete(m_pSpriteShot);
-		m_pSpriteShot = NULL;
-	}
 } // Quit
 
 void CPlayer::Reset(){
@@ -59,24 +41,16 @@ void CPlayer::Reset(){
     m_fSpawnSchutzTimer = 0.0f;
 } // Reset
 
-void CPlayer::Render(){
-	m_pSpritePlayer->SetPos(m_fXPos, m_fYPos);
-	m_pSpritePlayer->Render(m_fAnimPhase);
-} // Render
-
-
 void CPlayer::UpdateShots(bool game_is_paused,
                           const double seconds){
-	list<CShot>::iterator it = m_ShotList.begin();
-	m_CurShots = 0;
+    list<CShot>::iterator it = m_ShotList.begin();
 	while(it != m_ShotList.end()){
 			
         if(game_is_paused == false)
             it->Update(seconds);
     		
         if(it->IsAlive()){
-			it++;
-			m_CurShots++;
+            it++;
 		}
 		else {	
 			it = m_ShotList.erase(it);
@@ -118,14 +92,9 @@ void CPlayer::ProcessAction(const Action &action, const double seconds){
             m_fAnimPhase += 20.0f * seconds;
 	}
     if (action == SHOOT){
-    
         CShot shot(m_fXPos, m_fYPos);
-    
         m_ShotList.push_back(shot);
-    
         m_bShotLock = true;
-    
-		m_CurShots++;
 	}
 } // ProcessShooting
 
@@ -140,14 +109,6 @@ void CPlayer::CheckPosition(){
 	else if(m_fAnimPhase > 10.0f)
 		m_fAnimPhase = 10.0f;
 } // CheckPostion
-
-void CPlayer::DecreaseShots(){
-	m_CurShots--;
-} // DecreaseShots
-
-int CPlayer::GetXPosition(){
-	return m_fXPos;
-} // GetXPosition
 
 int CPlayer::GetLeben(){
 	return m_Leben;

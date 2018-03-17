@@ -19,6 +19,7 @@ add_executable(AsteroidsReinformentLearning asteroid.cpp
     humanplayer.cpp
     randomplayer.cpp
     renderer.cpp
+    reinforcementlearningplayer.cpp
     sdlrenderer.cpp
     shot.cpp
     spiel.cpp
