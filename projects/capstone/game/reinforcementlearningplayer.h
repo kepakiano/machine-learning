@@ -7,6 +7,8 @@ class ReinforcementLearningPlayer : public CPlayer
 {
 public:
     ReinforcementLearningPlayer();
+
+    Action getAction() override;
 };
 
 #endif // REINFORCEMENTLEARNINGPLAYER_H

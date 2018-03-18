@@ -58,7 +58,8 @@ void CPlayer::UpdateShots(bool game_is_paused,
 	}
 } // RenderShots
 
-void CPlayer::Update(const double seconds){
+void CPlayer::Update(const double seconds,
+                     const Action &action){
     m_LebensenergieTimer += seconds;
     m_fSpawnSchutzTimer += seconds;
     m_fSpawnSchutz += seconds;
@@ -66,7 +67,6 @@ void CPlayer::Update(const double seconds){
     if(m_fSpawnSchutzTimer > 0.5f)
         m_fSpawnSchutzTimer = 0.0f;
 
-    Action action = getAction();
     ProcessAction(action, seconds);
 	CheckPosition();
 	

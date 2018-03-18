@@ -8,7 +8,6 @@ class RandomPlayer : public CPlayer
 public:
     RandomPlayer();
 
-protected:
     Action getAction() override;
 
 private:

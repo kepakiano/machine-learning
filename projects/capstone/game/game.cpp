@@ -33,7 +33,7 @@ CGame::CGame(const int screen_width, const int screen_height)
 void CGame::Init(){
     renderer->Init();
 	
-    m_pPlayer = new RandomPlayer();
+    m_pPlayer = new ReinforcementLearningPlayer();
 	m_pPlayer->Init();
 	m_pPlayer->Reset();
 
@@ -81,7 +81,8 @@ void CGame::Run(){
         UpdateAsteroids(m_bPause);
 
 		if(m_bPause == false){
-            m_pPlayer->Update(m_pTimer->GetElapsed());
+            Action action = m_pPlayer->getAction();
+            m_pPlayer->Update(m_pTimer->GetElapsed(), action);
  			SpawnAsteroids();
             CheckCollisions();
         }

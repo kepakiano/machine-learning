@@ -4,3 +4,8 @@ ReinforcementLearningPlayer::ReinforcementLearningPlayer()
 {
 
 }
+
+Action ReinforcementLearningPlayer::getAction()
+{
+
+}

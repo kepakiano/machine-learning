@@ -9,7 +9,6 @@ SdlRenderer::SdlRenderer(int screen_width, int screen_height)
     , screen_width(screen_width)
     , screen_height(screen_height)
 {
-
 }
 
 

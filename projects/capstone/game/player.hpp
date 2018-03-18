@@ -19,7 +19,7 @@ class CPlayer{
 		void Init	();
         void Quit	();
         void UpdateShots(bool pause, const double seconds);
-        void Update	(const double seconds);
+        void Update	(const double seconds, const Action &action);
 		void Reset	();
         list<CShot>& GetShotList(){
             return m_ShotList;
@@ -42,8 +42,8 @@ class CPlayer{
 
         float GetSpawnSchutz() const {return m_fSpawnSchutz;}
 
-    protected:
         virtual Action getAction() = 0;
+    protected:
         bool isShootingPossible(){
             return m_ShotList.size() < m_MaxShots;
         }

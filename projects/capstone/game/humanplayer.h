@@ -8,7 +8,6 @@ class HumanPlayer : public CPlayer
 public:
     HumanPlayer();
 
-protected:
     virtual Action getAction() override;
 };
 
