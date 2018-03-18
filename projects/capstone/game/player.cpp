@@ -5,6 +5,8 @@
 CPlayer::CPlayer()
     : m_fSpawnSchutz(3.0f)
     , m_fSpawnSchutzTimer(0.0f)
+    , m_fShotCooldown(0.5f)
+    , m_fShotCooldownTimer(0.5f)
 {
 }
 
@@ -18,9 +20,8 @@ void CPlayer::Init(){
     m_fSpawnSchutzTimer = 0.0f;
 } // Init
 
-void CPlayer::SetWerte(int leben, int max_schuesse, int dmg_raumstation, float regen_raumstation){
-	m_Leben = leben;
-	m_MaxShots = max_schuesse;
+void CPlayer::SetWerte(int leben, int dmg_raumstation, float regen_raumstation){
+    m_Leben = leben;
 	m_DmgRaumstation = dmg_raumstation;
 	m_RegenRaumstation = regen_raumstation;
 } // SetWerte
@@ -39,6 +40,8 @@ void CPlayer::Reset(){
 	m_bShotLock = false;
     m_fSpawnSchutz = 0.0f;
     m_fSpawnSchutzTimer = 0.0f;
+
+    m_fShotCooldownTimer = 0.5f;
 } // Reset
 
 void CPlayer::UpdateShots(bool game_is_paused,
@@ -63,6 +66,7 @@ void CPlayer::Update(const double seconds,
     m_LebensenergieTimer += seconds;
     m_fSpawnSchutzTimer += seconds;
     m_fSpawnSchutz += seconds;
+    m_fShotCooldownTimer += seconds;
 
     if(m_fSpawnSchutzTimer > 0.5f)
         m_fSpawnSchutzTimer = 0.0f;
@@ -95,6 +99,7 @@ void CPlayer::ProcessAction(const Action &action, const double seconds){
         CShot shot(m_fXPos, m_fYPos);
         m_ShotList.push_back(shot);
         m_bShotLock = true;
+        m_fShotCooldownTimer = 0.0f;
 	}
 } // ProcessShooting
 

@@ -7,7 +7,7 @@ HumanPlayer::HumanPlayer()
 
 }
 
-Action HumanPlayer::getAction()
+Action HumanPlayer::getAction(const std::list<CAsteroid> &)
 {
     if(g_pFramework->KeyDown(SDLK_SPACE) == false)
             m_bShotLock = false;

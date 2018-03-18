@@ -5,7 +5,8 @@ ReinforcementLearningPlayer::ReinforcementLearningPlayer()
 
 }
 
-Action ReinforcementLearningPlayer::getAction()
+Action ReinforcementLearningPlayer::getAction(const std::list<CAsteroid> & asteroid_list)
 {
+
 
 }

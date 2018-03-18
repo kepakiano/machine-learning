@@ -3,6 +3,8 @@
 #define PLAYER_HPP
 
 #include <list>
+
+#include "asteroid.hpp"
 #include "sprite.hpp"
 #include "shot.hpp"
 
@@ -32,7 +34,7 @@ class CPlayer{
 		int GetLebensenergie_Raumstation();
 		int GetScore();
 		
-		void SetWerte(int leben, int max_schuesse, int dmg_raumstation, float regen_raumstation);
+        void SetWerte(int leben, int dmg_raumstation, float regen_raumstation);
         void Raumstation_Getroffen();
 		int BerechnePunkte(int Asteroiden_Hoehe);
 
@@ -42,12 +44,12 @@ class CPlayer{
 
         float GetSpawnSchutz() const {return m_fSpawnSchutz;}
 
-        virtual Action getAction() = 0;
+        virtual Action getAction(const std::list<CAsteroid> & asteroid_list) = 0;
     protected:
         bool isShootingPossible(){
-            return m_ShotList.size() < m_MaxShots;
+            return m_fShotCooldownTimer >= m_fShotCooldown;
         }
-        unsigned int m_MaxShots;
+//        unsigned int m_MaxShots;
         bool m_bShotLock;
 		
     private:
@@ -67,6 +69,9 @@ class CPlayer{
 		
         float m_fSpawnSchutz;
         float m_fSpawnSchutzTimer;
+
+        const float m_fShotCooldown;
+        float m_fShotCooldownTimer;
 
 		unsigned int m_Leben;
 		unsigned int m_Lebensenergie_Raumstation;

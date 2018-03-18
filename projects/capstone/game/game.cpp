@@ -33,7 +33,7 @@ CGame::CGame(const int screen_width, const int screen_height)
 void CGame::Init(){
     renderer->Init();
 	
-    m_pPlayer = new ReinforcementLearningPlayer();
+    m_pPlayer = new RandomPlayer();
 	m_pPlayer->Init();
 	m_pPlayer->Reset();
 
@@ -49,7 +49,7 @@ void CGame::Init(){
 
     SetDifficultyLevel(renderer->GetDifficultyLevel());
 
-    m_pPlayer->SetWerte(m_PlayerLeben, m_PlayerMaxSchuesse, m_DmgRaumstation, m_RegenRaumstation);
+    m_pPlayer->SetWerte(m_PlayerLeben, m_DmgRaumstation, m_RegenRaumstation);
 } // Init
 
 void CGame::Quit(){
@@ -81,7 +81,7 @@ void CGame::Run(){
         UpdateAsteroids(m_bPause);
 
 		if(m_bPause == false){
-            Action action = m_pPlayer->getAction();
+            Action action = m_pPlayer->getAction(m_AsteroidList);
             m_pPlayer->Update(m_pTimer->GetElapsed(), action);
  			SpawnAsteroids();
             CheckCollisions();
@@ -210,24 +210,21 @@ void CGame::SetDifficultyLevel(int schwierigkeitsgrad){
     this->schwierigkeitsgrad = schwierigkeitsgrad;
 	if(schwierigkeitsgrad == 1){
 		m_SpeedAsteroid = 150.0f;
-		m_DmgRaumstation = 12;
-		m_PlayerMaxSchuesse = 5;
+        m_DmgRaumstation = 12;
 		m_PlayerLeben = 7;
 		m_RegenRaumstation = 0.2f;
 		m_SpawnTime = 1.0f;
 	}
 	else if (schwierigkeitsgrad == 2){
 		m_SpeedAsteroid = 175.0f;
-		m_DmgRaumstation = 16;
-		m_PlayerMaxSchuesse = 4;
+        m_DmgRaumstation = 16;
 		m_PlayerLeben = 6;
 		m_RegenRaumstation = 0.35f;
 		m_SpawnTime = 0.75f;
 	}
 	else{
 		m_SpeedAsteroid = 200.0f;
-		m_DmgRaumstation = 20;
-		m_PlayerMaxSchuesse = 3;
+        m_DmgRaumstation = 20;
 		m_PlayerLeben = 5;
 		m_RegenRaumstation = 0.5f;
 		m_SpawnTime = 0.5f;

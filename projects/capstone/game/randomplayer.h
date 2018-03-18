@@ -8,7 +8,7 @@ class RandomPlayer : public CPlayer
 public:
     RandomPlayer();
 
-    Action getAction() override;
+    Action getAction(const std::list<CAsteroid> &) override;
 
 private:
     Action last_action;

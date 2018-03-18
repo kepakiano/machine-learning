@@ -39,8 +39,7 @@ class CGame{
 		int schwierigkeitsgrad;
 		
 		// Variablen, die die Schwierigkeit beeinflussen
-		int m_DmgRaumstation;
-		int m_PlayerMaxSchuesse;
+        int m_DmgRaumstation;
 		int m_PlayerLeben;
 		float m_RegenRaumstation;
 		float m_SpawnTime;

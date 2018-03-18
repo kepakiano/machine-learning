@@ -8,7 +8,7 @@ class ReinforcementLearningPlayer : public CPlayer
 public:
     ReinforcementLearningPlayer();
 
-    Action getAction() override;
+    Action getAction(const std::list<CAsteroid> & asteroid_list) override;
 };
 
 #endif // REINFORCEMENTLEARNINGPLAYER_H
