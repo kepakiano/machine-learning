@@ -9,6 +9,9 @@ public:
     ReinforcementLearningPlayer();
 
     Action getAction(const std::list<CAsteroid> & asteroid_list) override;
+
+private:
+    int getAsteroidState(std::list<CAsteroid> asteroid_list);
 };
 
 #endif // REINFORCEMENTLEARNINGPLAYER_H

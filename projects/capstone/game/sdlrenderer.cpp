@@ -121,13 +121,13 @@ void SdlRenderer::RenderFrame(const std::list<CAsteroid> &asteroids,
     if(game_is_paused){
         RenderPause(seconds);
     }
-    else{
+//    else{
         RenderAsteroids(asteroids);
         RenderExplosions(explosions);
         UpdateTexts(player, seconds);
         RenderTexts();
         RenderPlayer(player);
-    }
+//    }
 
     g_pFramework->Flip();
 }

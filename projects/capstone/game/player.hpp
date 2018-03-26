@@ -51,13 +51,13 @@ class CPlayer{
         }
 //        unsigned int m_MaxShots;
         bool m_bShotLock;
-		
+
+        float m_fXPos;
     private:
 
         void ProcessAction(const Action &action, const double seconds);
 		void CheckPosition();
 
-		float m_fXPos;
 		float m_fYPos;
 		float m_fAnimPhase;
 		float m_LebensenergieTimer;
