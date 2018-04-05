@@ -1,0 +1,13 @@
+#ifndef GAMEEVENTS_HPP
+#define GAMEEVENTS_HPP
+
+enum GameEvent{
+    EMPTY_EVENT,
+    END_GAME,
+    TOGGLE_PAUSE,
+    UPDATE_LIVES_TEXT,
+    UPDATE_SCORE_TEXT,
+    UPDATE_ENERGY_TEXT
+};
+
+#endif // GAMEEVENTS_HPP
