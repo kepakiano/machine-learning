@@ -33,7 +33,7 @@ CGame::CGame(const int screen_width, const int screen_height)
 void CGame::Init(){
     renderer->Init();
 	
-    m_pPlayer = new ReinforcementLearningPlayer();
+    m_pPlayer = new ReinforcementLearningPlayer(false);
 	m_pPlayer->Init();
 	m_pPlayer->Reset();
 

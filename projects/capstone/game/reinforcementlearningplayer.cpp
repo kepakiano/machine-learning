@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
-ReinforcementLearningPlayer::ReinforcementLearningPlayer()
+ReinforcementLearningPlayer::ReinforcementLearningPlayer(bool learning)
 {
 
 }
