@@ -55,6 +55,12 @@ int ReinforcementLearningPlayer::getAsteroidState(std::list<CAsteroid> asteroid_
     return state_code;
 }
 
+State ReinforcementLearningPlayer::buildState(const std::list<CAsteroid> &asteroid_list)
+{
+  
+  
+}
+
 Action ReinforcementLearningPlayer::getAction(const std::list<CAsteroid> &asteroid_list)
 {
     /**
