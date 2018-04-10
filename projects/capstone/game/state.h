@@ -1,11 +1,54 @@
 #ifndef STATE_H
 #define STATE_H
 
+#include <list>
+#include <map>
+#include <memory>
+#include <unordered_map>
+
+#include "action.h"
+#include "actionchoice.h"
+#include "asteroid.hpp"
+#include "shot.hpp"
+
+class State;
+
+using StatePtr = std::shared_ptr<State>;
+using StateHash = unsigned int long;
 
 class State
 {
 public:
   State();
+
+  StateHash hash() const {return hash_;}
+  std::list<ActionPtr> actions() const {return actions_;}
+  ActionPtr action(ActionChoice choice) {return actions_map_[choice];}
+
+  static State buildState(const std::list<CAsteroid> &asteroid_list,
+                          const float player_pos,
+                          const std::list<CShot>& shot_list,
+                          const int player_lives,
+                          const int space_station_health,
+                          const float weapons_array_cooldown);
+
+  static StatePtr getState(StateHash hash);
+
+private:
+  int getAsteroidState(std::list<CAsteroid> asteroid_list,
+                       const float player_position);
+
+  StateHash hash_;
+  std::map<ActionChoice, ActionPtr> actions_map_;
+  std::list<ActionPtr> actions_;
+
+  static std::list<ActionChoice> validActions(const float player_pos,
+                                              const float weapons_array_cooldown);
+  static std::unordered_map<StateHash, StatePtr> hashed_states_;
+  static StateHash hashState(const StatePtr& state);
+  static void safeState(const StatePtr& state, const StateHash hash);
+
+
 };
 
 #endif // STATE_H

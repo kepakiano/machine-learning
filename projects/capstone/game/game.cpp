@@ -81,7 +81,7 @@ void CGame::Run(){
         UpdateAsteroids(m_bPause);
 
 		if(m_bPause == false){
-            Action action = m_pPlayer->getAction(m_AsteroidList);
+            ActionChoice action = m_pPlayer->getAction(m_AsteroidList);
             m_pPlayer->Update(m_pTimer->GetElapsed(), action);
  			SpawnAsteroids();
             CheckCollisions();

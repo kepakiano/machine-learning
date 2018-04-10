@@ -1,6 +1,9 @@
 #ifndef REINFORCEMENTLEARNINGPLAYER_H
 #define REINFORCEMENTLEARNINGPLAYER_H
 
+#include <unordered_map>
+
+#include "action.h"
 #include "player.hpp"
 #include "state.h"
 
@@ -10,7 +13,7 @@ public:
     ReinforcementLearningPlayer(bool learning);
     virtual ~ReinforcementLearningPlayer () = default;
 
-    Action getAction(const std::list<CAsteroid> & asteroid_list) override;
+    ActionChoice getAction(const std::list<CAsteroid> & asteroid_list) override;
     
     void reset() {
         epsilon *= 0.99;
@@ -24,13 +27,15 @@ private:
     double gamma;
     
     bool learning;
+
+//    std::unordered_map<StateHash, std::list<ActionPtr>> states_to_actions_;
+    std::unordered_map<StateHash, StatePtr> states_;
     
     State buildState(const std::list<CAsteroid> &asteroid_list);
-    Action getBestAction();
-    void generateState();
-    Action chooseAction(const State& state);
-    void learn(const State& state,
-               const Action& action,
+    std::list<ActionPtr> getBestActions(const StateHash hash);
+    ActionChoice chooseAction(const StatePtr &state);
+    void learn(const StatePtr& state,
+               const ActionChoice& action,
                const double reward);
     
 };

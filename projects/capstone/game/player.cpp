@@ -62,7 +62,7 @@ void CPlayer::UpdateShots(bool game_is_paused,
 } // RenderShots
 
 void CPlayer::Update(const double seconds,
-                     const Action &action){
+                     const ActionChoice &action){
     m_LebensenergieTimer += seconds;
     m_fSpawnSchutzTimer += seconds;
     m_fSpawnSchutz += seconds;
@@ -80,7 +80,7 @@ void CPlayer::Update(const double seconds,
     }
 }
 
-void CPlayer::ProcessAction(const Action &action, const double seconds){
+void CPlayer::ProcessAction(const ActionChoice &action, const double seconds){
     if(action == MOVE_LEFT){
         m_fXPos -= 300.0f * seconds;
         m_fAnimPhase -= 20.0f * seconds;

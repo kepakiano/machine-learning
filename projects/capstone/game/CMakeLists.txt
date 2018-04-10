@@ -12,6 +12,7 @@ find_package(SDL_ttf REQUIRED)
 find_package(SDL_image REQUIRED)
 
 add_executable(AsteroidsReinformentLearning asteroid.cpp
+    action.cpp
     explosion.cpp
     framework.cpp
     game.cpp
@@ -24,6 +25,7 @@ add_executable(AsteroidsReinformentLearning asteroid.cpp
     shot.cpp
     spiel.cpp
     sprite.cpp
+    state.cpp
     texte.cpp
 )
 

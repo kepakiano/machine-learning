@@ -4,16 +4,11 @@
 
 #include <list>
 
+#include "actionchoice.h"
 #include "asteroid.hpp"
 #include "sprite.hpp"
 #include "shot.hpp"
 
-enum Action{
-    MOVE_RIGHT,
-    MOVE_LEFT,
-    SHOOT,
-    PASS
-};
 
 class CPlayer{
 	public:
@@ -21,7 +16,7 @@ class CPlayer{
 		void Init	();
         void Quit	();
         void UpdateShots(bool pause, const double seconds);
-        void Update	(const double seconds, const Action &action);
+        void Update	(const double seconds, const ActionChoice &action);
 		void Reset	();
         list<CShot>& GetShotList(){
             return m_ShotList;
@@ -44,7 +39,7 @@ class CPlayer{
 
         float GetSpawnSchutz() const {return m_fSpawnSchutz;}
 
-        virtual Action getAction(const std::list<CAsteroid> & asteroid_list) = 0;
+        virtual ActionChoice getAction(const std::list<CAsteroid> & asteroid_list) = 0;
     protected:
         bool isShootingPossible(){
             return m_fShotCooldownTimer >= m_fShotCooldown;
@@ -53,9 +48,9 @@ class CPlayer{
         bool m_bShotLock;
 
         float m_fXPos;
-    private:
+    protected:
 
-        void ProcessAction(const Action &action, const double seconds);
+        void ProcessAction(const ActionChoice &action, const double seconds);
 		void CheckPosition();
 
 		float m_fYPos;
