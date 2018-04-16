@@ -13,7 +13,12 @@ public:
     ReinforcementLearningPlayer(bool learning);
     virtual ~ReinforcementLearningPlayer () = default;
 
-    ActionChoice getAction(const std::list<CAsteroid> & asteroid_list) override;
+    void computeState(const std::list<CAsteroid> & asteroid_list) override;
+    virtual StatePtr getCurrentState() const override {return current_state;}
+    ActionChoice chooseAction() override;
+    void learn(
+               const double reward,
+               const StatePtr& new_state) override;
     
     void reset() {
         epsilon *= 0.99;
@@ -29,14 +34,13 @@ private:
     bool learning;
 
 //    std::unordered_map<StateHash, std::list<ActionPtr>> states_to_actions_;
-    std::unordered_map<StateHash, StatePtr> states_;
+//    std::unordered_map<StateHash, StatePtr> states_;
     
     State buildState(const std::list<CAsteroid> &asteroid_list);
-    std::list<ActionPtr> getBestActions(const StateHash hash);
-    ActionChoice chooseAction(const StatePtr &state);
-    void learn(const StatePtr& state,
-               const ActionChoice& action,
-               const double reward);
+    std::list<ActionPtr> getBestActions(const StatePtr &state);
+
+    StatePtr current_state;
+    ActionPtr current_action;
     
 };
 

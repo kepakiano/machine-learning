@@ -8,7 +8,7 @@ class HumanPlayer : public CPlayer
 public:
     HumanPlayer();
 
-    virtual ActionChoice getAction(const std::list<CAsteroid> &) override;
+    virtual ActionChoice chooseAction() override;
 };
 
 #endif // HUMANPLAYER_H

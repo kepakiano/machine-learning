@@ -14,11 +14,10 @@ CAsteroid::CAsteroid(float fXPos, float fYPos, float speed)
 	m_bIsAlive = true;
 } // Init
 
-void CAsteroid::Update(const bool pause, const double seconds){
-	if(pause == false){
-        m_fYPos += m_speed * seconds;
-        rectangle.y = m_fYPos;
-	}
+void CAsteroid::Update(const double seconds){
+    m_fYPos += m_speed * seconds;
+    rectangle.y = m_fYPos;
+
     m_fAnimPhase += 10.0f * seconds;
   
 	if(m_fAnimPhase >= 20.0f)

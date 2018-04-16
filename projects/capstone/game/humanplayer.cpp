@@ -7,7 +7,7 @@ HumanPlayer::HumanPlayer()
 
 }
 
-ActionChoice HumanPlayer::getAction(const std::list<CAsteroid> &)
+ActionChoice HumanPlayer::chooseAction()
 {
     if(g_pFramework->KeyDown(SDLK_SPACE) == false)
             m_bShotLock = false;

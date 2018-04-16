@@ -63,6 +63,7 @@ void CGame::Quit(){
 } // Quit
 
 void CGame::Run(){
+    m_pPlayer->computeState(m_AsteroidList);
 	while(m_bGameRun == true && m_pPlayer->GetLeben() > 0 && m_pPlayer->GetLebensenergie_Raumstation() > 0){
         m_pTimer->Update();
         auto start_of_frame = std::chrono::high_resolution_clock::now();
@@ -74,17 +75,29 @@ void CGame::Run(){
         if(game_event == TOGGLE_PAUSE)
             togglePause();
 
-  		FramesPerSecond();		
-		
-        UpdateExplosions();
-        m_pPlayer->UpdateShots(m_bPause, m_pTimer->GetElapsed());
-        UpdateAsteroids(m_bPause);
+        FramesPerSecond();
 
-		if(m_bPause == false){
-            ActionChoice action = m_pPlayer->getAction(m_AsteroidList);
+        if(m_bPause == false){
+            // Let the player analyze the current state and make a decision
+            // on what do to next
+            ActionChoice action = m_pPlayer->chooseAction();
+
+            // Update the environment given the player's action
+            m_pPlayer->UpdateShots(m_pTimer->GetElapsed());
             m_pPlayer->Update(m_pTimer->GetElapsed(), action);
+            UpdateExplosions();
+            UpdateAsteroids();
  			SpawnAsteroids();
-            CheckCollisions();
+
+            // Compute the reward the action (or a previous one) got the player
+            const double reward = CheckCollisions();
+            
+            // Update the player's current state
+            m_pPlayer->computeState(m_AsteroidList);
+            StatePtr new_state = m_pPlayer->getCurrentState();
+
+            // Let the player draw knowledge from the action it chose
+            m_pPlayer->learn(reward, new_state);
         }
 
         renderer->RenderFrame(m_AsteroidList,
@@ -123,7 +136,9 @@ void CGame::SpawnAsteroids(){
   }	
 } // SpawnAsteroids
 
-void CGame::CheckCollisions(){
+double CGame::CheckCollisions(){
+    double reward = rewardNoEvent();
+
     list<CShot> &ShotList = m_pPlayer->GetShotList();
 	list<CAsteroid>::iterator ItAsteroid = m_AsteroidList.begin();
 	list<CShot>::iterator ItShot;
@@ -142,7 +157,10 @@ void CGame::CheckCollisions(){
 			SpawnExplosion(RectAsteroid.x, RectAsteroid.y, m_SpeedAsteroid/2.0f);
 			SpawnExplosion(m_pPlayer->GetXPosition(), 530.0, m_SpeedAsteroid/2.0f);
             m_pPlayer->Reset();
+
+            reward += rewardShipHit();
 		}
+        // Does an asteroid get shot down?
         for(ItShot = ShotList.begin(); ItShot != ShotList.end(); ++ItShot){
             Rectangle RectShot = ItShot->GetRect();
 			
@@ -154,17 +172,22 @@ void CGame::CheckCollisions(){
 				
 				ItAsteroid->SetAlive(false);
                 ItShot->SetAlive(false);
-				m_punkte = m_pPlayer->BerechnePunkte(RectAsteroid.y);
+                const int punkte = m_pPlayer->BerechnePunkte(RectAsteroid.y);
                 renderer->handleGameEvent(UPDATE_SCORE_TEXT);
 				SpawnExplosion(RectAsteroid.x, RectAsteroid.y, m_SpeedAsteroid/2.0f);
-                renderer->SpawnScore(m_punkte, RectAsteroid.x, RectAsteroid.y);
+                renderer->SpawnScore(punkte, RectAsteroid.x, RectAsteroid.y);
+
+                reward += punkte;
 			}
 		}
 
+        // Does an asteroid hit the space station?
 		if(RectAsteroid.y > 590){
 			ItAsteroid->SetAlive(false);
 			m_pPlayer->Raumstation_Getroffen();
             renderer->handleGameEvent(UPDATE_ENERGY_TEXT);
+
+            reward -= m_pPlayer->getDamageToSpaceStation();
 		}
 		if(ItAsteroid->IsAlive())
 			ItAsteroid++;
@@ -172,11 +195,12 @@ void CGame::CheckCollisions(){
 			ItAsteroid = m_AsteroidList.erase(ItAsteroid); 
 		}
 	}
+    return reward;
 } // CheckCollisions
 
-void CGame::UpdateAsteroids(bool pause){
+void CGame::UpdateAsteroids(){
     for(CAsteroid &asteroid : m_AsteroidList)
-        asteroid.Update(pause, m_pTimer->GetElapsed());
+        asteroid.Update(m_pTimer->GetElapsed());
 }
 
 void CGame::UpdateExplosions(){

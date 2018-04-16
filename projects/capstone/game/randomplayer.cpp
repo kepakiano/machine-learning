@@ -8,7 +8,7 @@ RandomPlayer::RandomPlayer()
 
 }
 
-ActionChoice RandomPlayer::getAction(const std::list<CAsteroid> &)
+ActionChoice RandomPlayer::chooseAction()
 {
     if(frames_left_in_current_action == 0){
         if(getRandomNumberBetween(0, 2) == 0)

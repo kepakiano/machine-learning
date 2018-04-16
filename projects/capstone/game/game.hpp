@@ -23,9 +23,9 @@ class CGame{
 		void SpawnAsteroids	();
 		void SpawnExplosion	(int x, int y, float speed);
 		void SpawnScore		(int punkte, int x, int y);
-        void UpdateAsteroids(bool pause);
+        void UpdateAsteroids();
         void UpdateExplosions	();
-        void CheckCollisions	();
+        double CheckCollisions();
 		void FramesPerSecond	();
 		void toggleFPS		();
         void togglePause	();
@@ -64,8 +64,7 @@ class CGame{
 		bool m_bGameRun;
 		
         bool m_bPause;
-		
-		int m_punkte;
+
 		int m_AlterHighscore;
 		bool m_bNewHighscore;
 
@@ -73,6 +72,9 @@ class CGame{
         const int screen_height;
 		
         const int num_distinct_spawnpoints;
+
+        double rewardNoEvent() {return 1.0;}
+        double rewardShipHit() {return -100.0;}
 
 
 };

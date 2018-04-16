@@ -44,13 +44,10 @@ void CPlayer::Reset(){
     m_fShotCooldownTimer = 0.5f;
 } // Reset
 
-void CPlayer::UpdateShots(bool game_is_paused,
-                          const double seconds){
+void CPlayer::UpdateShots(const double seconds){
     list<CShot>::iterator it = m_ShotList.begin();
 	while(it != m_ShotList.end()){
-			
-        if(game_is_paused == false)
-            it->Update(seconds);
+        it->Update(seconds);
     		
         if(it->IsAlive()){
             it++;

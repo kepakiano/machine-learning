@@ -6,6 +6,11 @@
 #include "utilities.hpp"
 
 ReinforcementLearningPlayer::ReinforcementLearningPlayer(bool learning)
+    : epsilon(1.0)
+    , alpha(0.8)
+    , gamma(0.8)
+    , current_state(nullptr)
+    , current_action(nullptr)
 {
 
 }
@@ -57,28 +62,18 @@ int ReinforcementLearningPlayer::getAsteroidState(std::list<CAsteroid> asteroid_
     return state_code;
 }
 
-State ReinforcementLearningPlayer::buildState(const std::list<CAsteroid> &asteroid_list)
-{
-    return State::buildState(asteroid_list,
-                 m_fXPos,
-                 m_ShotList,
-                 m_Leben,
-                 m_Lebensenergie_Raumstation,
-                 m_fShotCooldownTimer
-                 );
-  
-
-}
-
 /**
  * @brief ReinforcementLearningPlayer::getBestActions Given the hash of a State
  * this method returns all the actions with the best rewards.
  */
-std::list<ActionPtr> ReinforcementLearningPlayer::getBestActions(const StateHash hash)
+std::list<ActionPtr> ReinforcementLearningPlayer::getBestActions(const StatePtr& state)
 {
     std::list<ActionPtr> best_actions;
-    for(const auto& action : states_[hash]->actions()){
-        if(action->reward() > (*best_actions.begin())->reward()){
+    for(const auto& action : state->actions()){
+        if(best_actions.empty()){
+            best_actions.push_back(action);
+        }
+        else if(action->reward() > (*best_actions.begin())->reward()){
             best_actions.clear();
             best_actions.push_back(action);
         } else if (action->reward() < (*best_actions.begin())->reward()){
@@ -90,101 +85,37 @@ std::list<ActionPtr> ReinforcementLearningPlayer::getBestActions(const StateHash
     return best_actions;
 }
 
-ActionChoice ReinforcementLearningPlayer::chooseAction(const StatePtr& state)
+ActionChoice ReinforcementLearningPlayer::chooseAction()
 {
-    /**
-
-        """ The choose_action function is called when the agent is asked to choose
-            which action to take, based on the 'state' the smartcab is in. """
-
-        # Set the agent state and default action
-        self.state = state
-        self.next_waypoint = self.planner.next_waypoint()
-        action = None
-
-        ###########
-        ## TO DO ##
-        ###########
-        # When not learning, choose a random action
-        # When learning, choose a random action with 'epsilon' probability
-        # Otherwise, choose an action with the highest Q-value for the current state
-        # Be sure that when choosing an action with highest Q-value that you randomly select between actions that "tie".
-        if not self.learning or random.random() < self.epsilon:
-            action = random.choice(self.valid_actions)
-        else:
-            action = random.choice(self.get_best_actions(state))
-
-        return action
-    */
-
     if(learning && getRandomDoubleBetween(0.0, 1.0) < epsilon){
-        const auto& valid_actions = state->actions();
-        return (*randomChoice(valid_actions.begin(), valid_actions.end()))->choice();
+        const auto& valid_actions = current_state->actions();
+        current_action = (*randomChoice(valid_actions.begin(), valid_actions.end()));
     }
     else {
-        const auto& best_actions = getBestActions(state->hash());
-        return (*randomChoice(best_actions.begin(), best_actions.end()))->choice();
+        const auto& best_actions = getBestActions(current_state);
+        current_action = (*randomChoice(best_actions.begin(), best_actions.end()));
     }
+    return current_action->choice();
 }
 
-void ReinforcementLearningPlayer::learn(const StatePtr& state,
-                                        const ActionChoice &choice,
-                                        const double reward)
+void ReinforcementLearningPlayer::learn(const double reward,
+                                        const StatePtr& new_state)
 {
-    /*
-        """ The learn function is called after the agent completes an action and
-            receives a reward. This function does not consider future rewards
-            when conducting learning. """
+    const double next_Q = getBestActions(new_state).front()->reward();
+    const double Q_st_at = current_action->reward();
+    const double new_reward = Q_st_at + alpha * (reward + gamma * next_Q - Q_st_at);
 
-        ###########
-        ## TO DO ##
-        ###########
-        # When learning, implement the value iteration update rule
-        #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
-        Q_st_at = self.Q[state][action]
-        r_t = reward
-
-        if self.learning:
-            self.Q[state][action] = Q_st_at + self.alpha * (r_t - Q_st_at)
-*/
-    ActionPtr action = state->action(choice);
-    const double Q_st_at = action->reward();
-    const double new_reward = Q_st_at + alpha * (reward - Q_st_at);
-
-    action->setReward(new_reward);
+    current_action->setReward(new_reward);
 }
 
-ActionChoice ReinforcementLearningPlayer::getAction(const std::list<CAsteroid> &asteroid_list)
+void ReinforcementLearningPlayer::computeState(const std::list<CAsteroid> &asteroid_list)
 {
-    /**
-      The following variables comprise the state of the game:
-      1. Positions of asteroids
-      2. Player position
-      3. Position of shots
-      4. Health of the ship
-      5. Health of the space station
-      6. Cooldown time of the weapons array
-      */
-
-    // We need to bring the complexity of the game state down to something the agent can process.
-    // Therefore, some simplicfications:
-    // The asteroid position will be broken down into the following:
-
-    // Is there an asteroid in front of the ship?
-    // Is the closest asteroid which is not in front of the ship to the right/left/doesn't exist?
-    // Is the second closest asteroid which is not in front of the ship to the right/left/doesn't exist?
-
-    const int state_code = getAsteroidState(asteroid_list);
-
-    if(state_code % 2 == 1 && isShootingPossible())
-        return SHOOT;
-    if(state_code % 100 / 10 % 3 == 2){
-        return MOVE_RIGHT;
-    }
-    if(state_code % 100 / 10 % 3 == 1)
-        return MOVE_LEFT;
-    return PASS;
-
-
-
+    current_state = State::getState(asteroid_list,
+                 m_fXPos,
+                 m_ShotList,
+                 m_Leben,
+                 m_Lebensenergie_Raumstation,
+                 m_fShotCooldownTimer
+                 );
+    
 }

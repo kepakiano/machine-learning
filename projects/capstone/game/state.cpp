@@ -4,12 +4,16 @@
 
 std::unordered_map<StateHash, StatePtr> State::hashed_states_;
 
-State::State()
+State::State(const size_t hash,
+             const std::list<ActionPtr>& valid_actions)
+    : hash_(hash)
+    , actions_(valid_actions)
 {
-
+    for(const auto& action : valid_actions)
+        actions_map_.insert({action->choice(), action});
 }
 
-int State::getAsteroidState(std::list<CAsteroid> asteroid_list,
+size_t State::getAsteroidState(std::list<CAsteroid> asteroid_list,
                             const float player_position)
 {
 
@@ -24,8 +28,8 @@ int State::getAsteroidState(std::list<CAsteroid> asteroid_list,
     // 1 = asteroid is left
     // 2 = asteroid is right
     // 0 = asteroid does not exist
-    int next_asteroid_position = 0;
-    int second_next_asteroid_position = 0;
+    size_t next_asteroid_position = 0;
+    size_t second_next_asteroid_position = 0;
 
     for(const CAsteroid &asteroid : asteroid_list){
 
@@ -50,44 +54,92 @@ int State::getAsteroidState(std::list<CAsteroid> asteroid_list,
             }
         }
     }
-    int state_code = (there_is_an_asteroid_in_front_of_the_ship ? 1 : 0);
-    state_code += next_asteroid_position * 10;
-    state_code += second_next_asteroid_position * 100;
 
-    return state_code;
+    // We use five bit to encode the asteroid state
+    size_t asteroid_state = 0;
+    if(there_is_an_asteroid_in_front_of_the_ship)
+        asteroid_state += 1u;
+    asteroid_state <<= 1;
+    asteroid_state += next_asteroid_position;
+    asteroid_state <<= 2;
+    asteroid_state += second_next_asteroid_position;
+    asteroid_state <<= 2;
+
+    return asteroid_state;
 }
 
 std::list<ActionChoice> State::validActions(const float player_pos,
                                             const float weapons_array_cooldown)
 {
+    std::list<ActionChoice> valid_actions = {PASS};
+    if(player_pos > 0.0)
+        valid_actions.push_back(MOVE_RIGHT);
+    if(player_pos < 752.0)
+        valid_actions.push_back(MOVE_LEFT);
+    if(weapons_array_cooldown > 0.5)
+        valid_actions.push_back(SHOOT);
 
-
+    return valid_actions;
 }
 
-StateHash State::hashState(const StatePtr &state)
-{
-
-}
 
 void State::safeState(const StatePtr &state, const StateHash hash)
 {
     hashed_states_.insert({hash, state});
 }
 
+StatePtr State::buildState(const size_t hash,
+                           const std::list<CAsteroid> &asteroid_list,
+                           const float player_pos,
+                           const std::list<CShot> &shot_list,
+                           const int player_lives,
+                           const int space_station_health,
+                           const float weapons_array_cooldown)
+{
+    const auto valid_action_choices = validActions(player_pos, weapons_array_cooldown);
+    std::list<ActionPtr> valid_actions;
+    for(const auto& action_choice : valid_action_choices)
+        valid_actions.push_back(std::make_shared<Action>(action_choice));
+    return std::make_shared<State>(hash, valid_actions);
+}
 
-State State::buildState(const std::list<CAsteroid> &asteroid_list,
-                        const float player_pos,
-                        const std::list<CShot>& shot_list,
-                        const int player_lives,
-                        const int space_station_health,
-                        const float weapons_array_cooldown)
+size_t State::hashState(const std::list<CAsteroid> &asteroid_list, const float player_pos, const std::list<CShot> &shot_list, const int player_lives, const int space_station_health, const float weapons_array_cooldown)
+{
+    return getAsteroidState(asteroid_list, player_pos);
+}
+
+StatePtr State::getState(const std::list<CAsteroid> &asteroid_list,
+                         const float player_pos,
+                         const std::list<CShot>& shot_list,
+                         const int player_lives,
+                         const int space_station_health,
+                         const float weapons_array_cooldown)
+{
+    const size_t hash = hashState(asteroid_list,
+                                player_pos,
+                                shot_list,
+                                player_lives,
+                                space_station_health,
+                                weapons_array_cooldown);
+
+    if(hashed_states_.find(hash) == hashed_states_.end()){
+        hashed_states_[hash] = buildState(hash,
+                                          asteroid_list,
+                                          player_pos,
+                                          shot_list,
+                                          player_lives,
+                                          space_station_health,
+                                          weapons_array_cooldown);
+    }
+    return hashed_states_[hash];
+}
+
+void State::loadStates()
 {
 
 }
 
-StatePtr State::getState(StateHash hash)
+void State::saveStates()
 {
-    if(hashed_states_.find(hash) == hashed_states_.end())
-        throw "Requested state that is not in state map yet";
-    return hashed_states_[hash];
+
 }
