@@ -129,7 +129,7 @@ int CPlayer::GetScore(){
 } // GetScore
 
 int CPlayer::BerechnePunkte(int Asteroiden_Hoehe){
-// 	m_Score += 60 +static_cast<int>(Asteroiden_Hoehe / 2);
-	m_Score += 60 + Asteroiden_Hoehe / 2;
-	return 60 +Asteroiden_Hoehe / 2;
+    const int score = (600-Asteroiden_Hoehe)-60;
+    m_Score += score;
+    return score;
 } // BerechnePunkte

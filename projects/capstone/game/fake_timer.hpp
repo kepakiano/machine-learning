@@ -19,8 +19,8 @@ public:
     virtual std::chrono::high_resolution_clock::time_point GetStartTime() override {
         return start;
     }
-    virtual void startFrame(){}
-    virtual void sleepForRestOfFrame(const std::chrono::high_resolution_clock::time_point &start_of_frame) {}
+    virtual void startFrame() override{}
+    virtual void sleepForRestOfFrame(const std::chrono::high_resolution_clock::time_point &start_of_frame) override {}
 
 private:
 

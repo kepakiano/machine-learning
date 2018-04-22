@@ -8,6 +8,9 @@ class HumanPlayer : public CPlayer
 public:
     HumanPlayer();
 
+    virtual void computeState(const std::list<CAsteroid> &) override {}
+    virtual void learn(const double, const StatePtr &) override {}
+    virtual StatePtr getCurrentState() const override { return nullptr;}
     virtual ActionChoice chooseAction() override;
 };
 

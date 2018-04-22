@@ -13,7 +13,12 @@ class CGame{
 	public:
         CGame(const int screen_width, const int screen_height);
 
-        void Init();
+        void Init(const bool use_sdl,
+                  const bool use_reinforcment_learning,
+                  const bool bot_is_learning,
+                  const double alpha,
+                  const double gamma,
+                  const double epsilon);
         void Run();
         void GameOver();
         void Quit();

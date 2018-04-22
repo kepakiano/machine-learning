@@ -14,6 +14,7 @@
 class CPlayer{
 	public:
 		CPlayer	();
+        virtual ~CPlayer() = default;
 		void Init	();
         void Quit	();
         void UpdateShots(const double seconds);

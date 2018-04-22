@@ -26,6 +26,7 @@ add_executable(AsteroidsReinformentLearning asteroid.cpp
     spiel.cpp
     sprite.cpp
     state.cpp
+    states.cpp
     texte.cpp
 )
 

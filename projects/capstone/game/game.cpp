@@ -23,17 +23,27 @@ using namespace std;
 CGame::CGame(const int screen_width, const int screen_height)
     : screen_width(screen_width), screen_height(screen_height), num_distinct_spawnpoints(8){
     m_pPlayer = NULL;
-    renderer = new SdlRenderer(screen_width, screen_height);
-    m_pTimer = new SdlTimer();
-
-//    renderer = new FakeRenderer();
-//    m_pTimer = new FakeTimer();
 }
 
-void CGame::Init(){
+void CGame::Init(const bool use_sdl,
+                 const bool use_reinforcment_learning,
+                 const bool bot_is_learning,
+                 const double alpha,
+                 const double gamma,
+                 const double epsilon){
+    if(use_reinforcment_learning){
+        m_pPlayer = new ReinforcementLearningPlayer(bot_is_learning, alpha, gamma, epsilon);
+    } else{
+        m_pPlayer = new HumanPlayer();
+    }
+    if(use_sdl){
+        renderer = new SdlRenderer(screen_width, screen_height);
+    } else {
+        renderer = new FakeRenderer();
+    }
+
     renderer->Init();
 	
-    m_pPlayer = new ReinforcementLearningPlayer(false);
 	m_pPlayer->Init();
 	m_pPlayer->Reset();
 
@@ -44,20 +54,27 @@ void CGame::Init(){
 	schwierigkeitsgrad = 0;
 
 	m_bGameRun = true;
-	
     m_bPause = false;
 
     SetDifficultyLevel(renderer->GetDifficultyLevel());
+
+    if(use_sdl){
+        m_pTimer = new SdlTimer();
+    } else {
+        m_pTimer = new FakeTimer();
+    }
 
     m_pPlayer->SetWerte(m_PlayerLeben, m_DmgRaumstation, m_RegenRaumstation);
 } // Init
 
 void CGame::Quit(){
-	if(m_pPlayer != NULL){
+    if(m_pPlayer != nullptr){
 		m_pPlayer->Quit();
-		delete(m_pPlayer);
-		m_pPlayer = NULL;
+        delete m_pPlayer;
+        m_pPlayer = nullptr;
 	}
+    m_AsteroidList.clear();
+    m_ExplosionList.clear();
   
     renderer->Quit();
 } // Quit
@@ -123,7 +140,6 @@ void CGame::SpawnAsteroids(){
     m_fAsteroidTimer += m_pTimer->GetElapsed();
   
     if(m_fAsteroidTimer >= m_SpawnTime){
-
         const int asteroid_width = 64;
         const int space_between_spawnpoints = screen_width / num_distinct_spawnpoints;
         const int leftmost_position = space_between_spawnpoints - asteroid_width / 2;
