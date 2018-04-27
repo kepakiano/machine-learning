@@ -1,9 +1,14 @@
+#include "databaseconnection.h"
 #include "framework.hpp"
 #include "game.hpp"
-
 #include "states.h"
+
 int main(int argc, char *argv[]){
 
+    DatabaseConnection::createTables();
+    DatabaseConnection::addRowEnvironment(1.0, 3.0, 3.0, "lalala");
+
+    return EXIT_SUCCESS;
 
     const int screen_width = 800;
     const int screen_height = 600;

@@ -1,0 +1,3 @@
+[submodule "projects/capstone/game/SQLiteCpp"]
+	path = projects/capstone/game/SQLiteCpp
+	url = https://github.com/SRombauts/SQLiteCpp
