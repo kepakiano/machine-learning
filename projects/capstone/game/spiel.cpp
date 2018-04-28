@@ -6,7 +6,11 @@
 int main(int argc, char *argv[]){
 
     DatabaseConnection::createTables();
+    DatabaseConnection::addRowEnvironment(2.0, 3.0, 3.0, "lalala");
     DatabaseConnection::addRowEnvironment(1.0, 3.0, 3.0, "lalala");
+    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, "lalala") << std::endl;
+    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, "lalala") << std::endl;
+    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, "lalala") << std::endl;
 
     return EXIT_SUCCESS;
 

@@ -14,6 +14,7 @@ public:
                                   double reward_no_event,
                                   double reward_ship_hit,
                                   const std::string& environment_description);
+
     static int getIdEnvironment(double reward_space_station_hit,
                                 double reward_no_event,
                                 double reward_ship_hit,
@@ -27,6 +28,14 @@ public:
                                  const double score_std,
                                  const double score_min, const double time_taken);
 
+    static int getIdTestCases(const size_t environment_id,
+                              const double alpha,
+                              const double gamma,
+                              const std::string& epsilon_function,
+                              const double score_avg,
+                              const double score_std,
+                              const double score_min,
+                              const double time_taken);
 private:
     static const std::string database_file;
 
