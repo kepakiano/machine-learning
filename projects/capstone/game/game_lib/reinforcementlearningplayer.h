@@ -10,7 +10,9 @@
 class ReinforcementLearningPlayer : public CPlayer
 {
 public:
-    ReinforcementLearningPlayer(bool learning, double alpha, double gamma, double epsilon);
+    ReinforcementLearningPlayer(bool learning, double alpha,
+                                double gamma, double epsilon,
+                                size_t environment_number);
     virtual ~ReinforcementLearningPlayer() override = default;
 
     void computeState(const std::list<CAsteroid> & asteroid_list) override;
@@ -29,12 +31,15 @@ private:
     double gamma;
     
     bool learning;
+
+    size_t environment_number;
     
     State buildState(const std::list<CAsteroid> &asteroid_list);
     std::list<ActionPtr> getBestActions(const StatePtr &state);
 
     StatePtr current_state;
     ActionPtr current_action;
+
     
 };
 

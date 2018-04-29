@@ -6,11 +6,16 @@
 #include "states.h"
 #include "utilities.hpp"
 
-ReinforcementLearningPlayer::ReinforcementLearningPlayer(bool learning, double alpha, double gamma, double epsilon)
+ReinforcementLearningPlayer::ReinforcementLearningPlayer(bool learning,
+                                                         double alpha,
+                                                         double gamma,
+                                                         double epsilon,
+                                                         size_t environment_number)
     : epsilon(epsilon)
     , alpha(alpha)
     , gamma(gamma)
     , learning(learning)
+    , environment_number(environment_number)
     , current_state(nullptr)
     , current_action(nullptr)
 {
@@ -61,9 +66,6 @@ void ReinforcementLearningPlayer::learn(const double reward,
     const double new_reward = Q_st_at + alpha * (reward + gamma * next_Q - Q_st_at);
 
     current_action->setReward(new_reward);
-
-//    epsilon *= 0.995;
-//    std::cout << epsilon << std::endl;
 }
 
 void ReinforcementLearningPlayer::computeState(const std::list<CAsteroid> &asteroid_list)
@@ -74,6 +76,5 @@ void ReinforcementLearningPlayer::computeState(const std::list<CAsteroid> &aster
                  m_Leben,
                  m_Lebensenergie_Raumstation,
                  m_fShotCooldownTimer
-                 );
-    
+                 );    
 }

@@ -14,7 +14,7 @@ public:
                             const float weapons_array_cooldown);
 
     static void loadStates();
-    static void saveStates();
+    static void saveStates(const int test_cases_id);
 
     static void printStatistics();
 private:

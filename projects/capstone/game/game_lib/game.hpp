@@ -10,76 +10,85 @@
 #include "timer.hpp"
 
 class CGame{
-	public:
-        CGame(const int screen_width, const int screen_height);
+public:
+  CGame(const int screen_width, const int screen_height);
 
-        void Init(const bool use_sdl,
-                  const bool use_reinforcment_learning,
-                  const bool bot_is_learning,
-                  const double alpha,
-                  const double gamma,
-                  const double epsilon);
-        void Run();
-        void GameOver();
-        void Quit();
+  void Init(const bool use_sdl);
+  void configureReinforcementLearning(
+      const bool bot_is_learning,
+      const double alpha,
+      const double gamma,
+      const double epsilon,
+      const double reward_space_station_hit,
+      const double reward_no_event,
+      const double reward_ship_hit,
+      const size_t environment_number);
+  void Run();
+  void GameOver();
+  void Quit();
 
-	private:
-		void ProcessEvents	();
-		void SpawnAsteroids	();
-		void SpawnExplosion	(int x, int y, float speed);
-		void SpawnScore		(int punkte, int x, int y);
-        void UpdateAsteroids();
-        void UpdateExplosions	();
-        double CheckCollisions();
-		void FramesPerSecond	();
-		void toggleFPS		();
-        void togglePause	();
-		bool NewHighscore	();
-        void SetDifficultyLevel(int schwierigkeitsgrad);
-		
-		SDL_Surface* load_image(string filename);
+private:
+  void ProcessEvents	();
+  void SpawnAsteroids	();
+  void SpawnExplosion	(int x, int y, float speed);
+  void SpawnScore		(int punkte, int x, int y);
+  void UpdateAsteroids();
+  void UpdateExplosions	();
+  double CheckCollisions();
+  void FramesPerSecond	();
+  void toggleFPS		();
+  void togglePause	();
+  bool NewHighscore	();
+  void SetDifficultyLevel(int schwierigkeitsgrad);
 
-        Renderer *renderer;
-    
-		int schwierigkeitsgrad;
-		
-		// Variablen, die die Schwierigkeit beeinflussen
-        int m_DmgRaumstation;
-		int m_PlayerLeben;
-		float m_RegenRaumstation;
-		float m_SpawnTime;
-		float m_SpeedAsteroid;
+  SDL_Surface* load_image(string filename);
 
-		CPlayer *m_pPlayer;
-        CTimer *m_pTimer;
+  Renderer *renderer;
 
-		float m_fAsteroidTimer;
-		float m_fExplosionTimer;
+  int schwierigkeitsgrad;
 
-		float m_fStartRunTime;
-		
-		// Alles wichtige für den Framerate-Zähler
-		int fps;
-        int frames;
-		
-		list<CAsteroid> m_AsteroidList;
-        list<CExplosion> m_ExplosionList;
+  // Variablen, die die Schwierigkeit beeinflussen
+  int m_DmgRaumstation;
+  int m_PlayerLeben;
+  float m_RegenRaumstation;
+  float m_SpawnTime;
+  float m_SpeedAsteroid;
 
-		// läuft das Spiel?
-		bool m_bGameRun;
-		
-        bool m_bPause;
+  CPlayer *m_pPlayer;
+  CTimer *m_pTimer;
 
-		int m_AlterHighscore;
-		bool m_bNewHighscore;
+  float m_fAsteroidTimer;
+  float m_fExplosionTimer;
 
-        const int screen_width;
-        const int screen_height;
-		
-        const int num_distinct_spawnpoints;
+  float m_fStartRunTime;
 
-        double rewardNoEvent() {return 1.0;}
-        double rewardShipHit() {return -100.0;}
+  // Alles wichtige für den Framerate-Zähler
+  int fps;
+  int frames;
+
+  list<CAsteroid> m_AsteroidList;
+  list<CExplosion> m_ExplosionList;
+
+  // l?uft das Spiel?
+  bool m_bGameRun;
+
+  bool m_bPause;
+
+  int m_AlterHighscore;
+  bool m_bNewHighscore;
+
+  const int screen_width;
+  const int screen_height;
+
+  const int num_distinct_spawnpoints;
+
+  double reward_no_event_;
+  double reward_ship_hit_;
+  double reward_space_station_hit_multiplier_;
+
+  double rewardNoEvent() {return reward_no_event_;}
+  double rewardShipHit() {return reward_ship_hit_;}
+  double rewardSpaceStationHitMultiplier(){return reward_space_station_hit_multiplier_;}
 
 
 };

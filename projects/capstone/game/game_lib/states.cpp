@@ -1,5 +1,6 @@
 #include "states.h"
 
+#include "databaseconnection.h"
 
 std::unordered_map<StateHash, StatePtr> States::hashed_states_;
 
@@ -138,9 +139,9 @@ void States::loadStates()
 
 }
 
-void States::saveStates()
+void States::saveStates(const int test_cases_id)
 {
-
+  DatabaseConnection::safeStates(hashed_states_, test_cases_id);
 }
 
 void States::printStatistics()

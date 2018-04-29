@@ -6,11 +6,11 @@
 int main(int argc, char *argv[]){
 
     DatabaseConnection::createTables();
-    DatabaseConnection::addRowEnvironment(2.0, 3.0, 3.0, "lalala");
-    DatabaseConnection::addRowEnvironment(1.0, 3.0, 3.0, "lalala");
-    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, "lalala") << std::endl;
-    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, "lalala") << std::endl;
-    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, "lalala") << std::endl;
+    DatabaseConnection::addRowEnvironment(2.0, 3.0, 3.0, 1);
+    DatabaseConnection::addRowEnvironment(1.0, 3.0, 3.0, 1);
+    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, 1) << std::endl;
+    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, 1) << std::endl;
+    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, 1) << std::endl;
 
     return EXIT_SUCCESS;
 
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
             use_sdl_renderer = true;
         }
         std::cout << "epsilon: " << epsilon << " ";
-        Game.Init(use_sdl_renderer, reinforcement_learning, bot_is_learning, alpha, gamma, epsilon);
+        Game.Init(use_sdl_renderer/*, reinforcement_learning, bot_is_learning, alpha, gamma, epsilon*/);
         epsilon *= 0.999;
 
         Game.Run();
@@ -52,8 +52,8 @@ int main(int argc, char *argv[]){
 
     States::printStatistics();
   
-	g_pFramework->Quit();
-	g_pFramework->Del();
+  g_pFramework->Quit();
+  g_pFramework->Del();
   
-	return(0);
+  return(0);
 }
