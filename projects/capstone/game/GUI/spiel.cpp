@@ -5,12 +5,12 @@
 
 int main(int argc, char *argv[]){
 
-    DatabaseConnection::createTables();
-    DatabaseConnection::addRowEnvironment(2.0, 3.0, 3.0, 1);
-    DatabaseConnection::addRowEnvironment(1.0, 3.0, 3.0, 1);
-    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, 1) << std::endl;
-    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, 1) << std::endl;
-    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, 1) << std::endl;
+//    DatabaseConnection::createTables();
+//    DatabaseConnection::addRowEnvironment(2.0, 3.0, 3.0, 1);
+//    DatabaseConnection::addRowEnvironment(1.0, 3.0, 3.0, 1);
+//    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, 1) << std::endl;
+//    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, 1) << std::endl;
+//    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, 1) << std::endl;
 
     return EXIT_SUCCESS;
 

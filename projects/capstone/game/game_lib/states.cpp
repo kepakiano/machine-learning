@@ -94,7 +94,7 @@ StatePtr States::buildState(const size_t hash,
     return std::make_shared<State>(hash, valid_actions);
 }
 
-size_t States::hashState(const std::list<CAsteroid> &asteroid_list,
+size_t States::hashState1(const std::list<CAsteroid> &asteroid_list,
                          const float player_pos,
                          const std::list<CShot> &shot_list,
                          const int player_lives,
@@ -107,19 +107,68 @@ size_t States::hashState(const std::list<CAsteroid> &asteroid_list,
     return hash;
 }
 
+size_t States::hashState2(const std::list<CAsteroid> &asteroid_list,
+                         const float player_pos,
+                         const std::list<CShot> &shot_list,
+                         const int player_lives,
+                         const int space_station_health,
+                         const float weapons_array_cooldown)
+{
+    size_t hash = getAsteroidState(asteroid_list, player_pos);
+    hash <<= 1;
+    hash += (weapons_array_cooldown > 0.5f) ? 1u : 0u;
+    hash <<= 2;
+    hash += space_station_health <= 0 ? 0 : space_station_health / 34 + 1;
+    return hash;
+}
+
+size_t States::hashState3(const std::list<CAsteroid> &asteroid_list,
+                         const float player_pos,
+                         const std::list<CShot> &shot_list,
+                         const int player_lives,
+                         const int space_station_health,
+                         const float weapons_array_cooldown)
+{
+    size_t hash = hashState2(asteroid_list, player_pos,
+                             shot_list, player_lives, space_station_health,
+                             weapons_array_cooldown);
+    hash <<= 1;
+    hash += player_lives > 1;
+    return hash;
+}
+
+size_t States::hashState(const std::list<CAsteroid> &asteroid_list,
+                         const float player_pos,
+                         const std::list<CShot> &shot_list,
+                         const int player_lives,
+                         const int space_station_health,
+                         const float weapons_array_cooldown,
+                         const size_t environment_number)
+{
+  if(environment_number == 1)
+    return hashState1(asteroid_list, player_pos, shot_list, player_lives, space_station_health, weapons_array_cooldown);
+  if(environment_number == 2)
+    return hashState1(asteroid_list, player_pos, shot_list, player_lives, space_station_health, weapons_array_cooldown);
+  if(environment_number == 3)
+    return hashState1(asteroid_list, player_pos, shot_list, player_lives, space_station_health, weapons_array_cooldown);
+  throw false;
+}
+
 StatePtr States::getState(const std::list<CAsteroid> &asteroid_list,
                          const float player_pos,
                          const std::list<CShot>& shot_list,
                          const int player_lives,
                          const int space_station_health,
-                         const float weapons_array_cooldown)
+                         const float weapons_array_cooldown,
+                         const size_t environment_number)
 {
     const size_t hash = hashState(asteroid_list,
                                 player_pos,
                                 shot_list,
                                 player_lives,
                                 space_station_health,
-                                weapons_array_cooldown);
+                                weapons_array_cooldown,
+                                environment_number);
 
     if(hashed_states_.find(hash) == hashed_states_.end()){
         hashed_states_[hash] = buildState(hash,

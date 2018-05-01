@@ -38,9 +38,7 @@ private:
     std::list<ActionPtr> getBestActions(const StatePtr &state);
 
     StatePtr current_state;
-    ActionPtr current_action;
-
-    
+    ActionPtr current_action;    
 };
 
 #endif // REINFORCEMENTLEARNINGPLAYER_H

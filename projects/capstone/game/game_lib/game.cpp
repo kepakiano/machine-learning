@@ -66,7 +66,7 @@ void CGame::configureReinforcementLearning(const bool bot_is_learning,
                                            const double epsilon,
                                            const double reward_space_station_hit_multiplier,
                                            const double reward_no_event,
-                                           const double reward_ship_hit,
+                                           const double reward_ship_hit, const double reward_game_over,
                                            const size_t environment_number)
 {
   m_pPlayer = new ReinforcementLearningPlayer(bot_is_learning, alpha,
@@ -75,6 +75,7 @@ void CGame::configureReinforcementLearning(const bool bot_is_learning,
   reward_space_station_hit_multiplier_ = reward_space_station_hit_multiplier;
   reward_no_event_ = reward_no_event;
   reward_ship_hit_ = reward_ship_hit;
+  reward_game_over_ = reward_game_over;
 }
 
 void CGame::Quit(){
@@ -117,7 +118,10 @@ void CGame::Run(){
       SpawnAsteroids();
 
       // Compute the reward the action (or a previous one) got the player
-      const double reward = CheckCollisions();
+      double reward = CheckCollisions();
+
+      if(!(m_bGameRun == true && m_pPlayer->GetLeben() > 0 && m_pPlayer->GetLebensenergie_Raumstation() > 0))
+        reward += rewardGameOver();
 
       // Update the player's current state
       m_pPlayer->computeState(m_AsteroidList);

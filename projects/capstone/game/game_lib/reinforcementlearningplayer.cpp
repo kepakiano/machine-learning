@@ -75,6 +75,7 @@ void ReinforcementLearningPlayer::computeState(const std::list<CAsteroid> &aster
                  m_ShotList,
                  m_Leben,
                  m_Lebensenergie_Raumstation,
-                 m_fShotCooldownTimer
+                 m_fShotCooldownTimer,
+                 environment_number
                  );    
 }

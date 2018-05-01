@@ -22,10 +22,13 @@ public:
       const double reward_space_station_hit,
       const double reward_no_event,
       const double reward_ship_hit,
+      const double reward_game_over,
       const size_t environment_number);
   void Run();
   void GameOver();
   void Quit();
+
+  int getScore(){return m_pPlayer->GetScore();}
 
 private:
   void ProcessEvents	();
@@ -85,10 +88,12 @@ private:
   double reward_no_event_;
   double reward_ship_hit_;
   double reward_space_station_hit_multiplier_;
+  double reward_game_over_;
 
   double rewardNoEvent() {return reward_no_event_;}
   double rewardShipHit() {return reward_ship_hit_;}
   double rewardSpaceStationHitMultiplier(){return reward_space_station_hit_multiplier_;}
+  double rewardGameOver(){return reward_game_over_;}
 
 
 };
