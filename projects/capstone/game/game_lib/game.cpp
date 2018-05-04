@@ -202,6 +202,7 @@ double CGame::CheckCollisions(){
 
         ItAsteroid->SetAlive(false);
         ItShot->SetAlive(false);
+        std::cout << ItShot->getLifetime() << std::endl;
         const int punkte = m_pPlayer->BerechnePunkte(RectAsteroid.y);
         renderer->handleGameEvent(UPDATE_SCORE_TEXT);
         SpawnExplosion(RectAsteroid.x, RectAsteroid.y, m_SpeedAsteroid/2.0f);

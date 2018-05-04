@@ -2,7 +2,9 @@
 #include "shot.hpp"
 
 CShot::CShot(float fXPos, float fYPos)
-    : m_Rect(fXPos, fYPos, 64, 64){
+    : m_Rect(fXPos, fYPos, 64, 64)
+    , lifetime(0)
+{
 	m_fXPos = fXPos;
 	m_fYPos = fYPos;
 
@@ -14,6 +16,8 @@ void CShot::Update(const double seconds){
   
 	m_Rect.y = static_cast<int>(m_fYPos);
   
+  lifetime++;
+
 	if(m_fYPos < -15.0f){
         m_bIsAlive = false;
 	}

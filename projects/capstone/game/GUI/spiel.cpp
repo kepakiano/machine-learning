@@ -12,7 +12,7 @@ int main(int argc, char *argv[]){
 //    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, 1) << std::endl;
 //    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, 1) << std::endl;
 
-    return EXIT_SUCCESS;
+//    return EXIT_SUCCESS;
 
     const int screen_width = 800;
     const int screen_height = 600;
@@ -23,8 +23,8 @@ int main(int argc, char *argv[]){
     bool use_sdl_renderer = true;
     bool bot_is_learning = true;
     double alpha, gamma;
-    size_t training_runs = 100;
-    const size_t test_runs = 3;
+    size_t training_runs = 1;
+    size_t test_runs =0;
     double epsilon = 1.0;
     if(argc == 4){
         training_runs = std::stoi(argv[1]);
@@ -32,6 +32,8 @@ int main(int argc, char *argv[]){
         gamma = std::stod(argv[3]);
         reinforcement_learning = true;
         use_sdl_renderer = false;
+        training_runs = 100;
+        test_runs = 3;
     }
     for(size_t i = 0; i < training_runs+test_runs; ++i){
         if(i == training_runs && reinforcement_learning){

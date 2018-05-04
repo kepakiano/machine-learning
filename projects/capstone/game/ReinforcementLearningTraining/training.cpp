@@ -1,3 +1,4 @@
+#include <numeric>
 #include <iostream>
 
 #include <boost/program_options.hpp>
@@ -38,7 +39,7 @@ int processCommandLineOptions(int argc,
             ("reward-space-station-hit,s",po::value<double>(&reward_space_station_hit), "")
             ("reward-no-event,n",         po::value<double>(&reward_no_event),          "Resampling threshold")
             ("reward-ship-hit,h",         po::value<double>(&reward_ship_hit),          "Resampling threshold")
-            ("reward_game_over,o",         po::value<double>(&reward_game_over),          "Resampling threshold")
+            ("reward_game_over,o",        po::value<double>(&reward_game_over),          "Resampling threshold")
             ("environment-number,e",      po::value<size_t>(&environment_number),       "Number of interspersed particles per gesture per resample step")
             ("alpha,a",                   po::value<double>(&alpha),                    "Resampling threshold")
             ("gamma,g",                   po::value<double>(&gamma),                    "Resampling threshold")
@@ -133,7 +134,7 @@ int main(int argc, char** argv){
   }
 
 
-//  DatabaseConnection::createTables();
+  DatabaseConnection::createTables();
   CGame Game(800, 600);
 
   const size_t training_runs = 10000;
@@ -160,6 +161,7 @@ int main(int argc, char** argv){
     Game.Init(false);
 
     Game.Run();
+    std::cout << i << " epsilon: " << epsilon <<  " ";
     Game.GameOver();
       if(i >= training_runs)
         scores.push_back(Game.getScore());
@@ -168,6 +170,7 @@ int main(int argc, char** argv){
     epsilon = calculateEpsilon(epsilon_function, epsilon, i, training_runs);
   }
   double score_min = *std::min_element(scores.begin(), scores.end());
+  double score_max = *std::max_element(scores.begin(), scores.end());
   double sum = std::accumulate(scores.begin(), scores.end(), 0.0);
   double mean = sum / scores.size();
 
@@ -180,7 +183,7 @@ int main(int argc, char** argv){
   double stdev = std::sqrt(sq_sum / scores.size());
   double score_std = stdev;
 
-  DatabaseConnection::addRowTestCases(environment_id, alpha, gamma, epsilon_function, score_avg, score_std, score_min, 0.0);
+  DatabaseConnection::addRowTestCases(environment_id, alpha, gamma, epsilon_function, score_avg, score_std, score_min, score_max, 0.0);
   const int test_cases_id = DatabaseConnection::getIdTestCases(environment_id, alpha, gamma, epsilon_function);
   States::saveStates(test_cases_id);
   return EXIT_SUCCESS;

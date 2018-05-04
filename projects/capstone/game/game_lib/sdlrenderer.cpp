@@ -51,22 +51,22 @@ void SdlRenderer::Init(){
     m_pEliteFlieger = new CText("3. Elite-Flieger", 210, 350, 15);
 
     m_pSpriteBackground = new CSprite;
-    m_pSpriteBackground->Load("../assets/Background.png");
+    m_pSpriteBackground->Load("../../assets/Background.png");
 
     m_pSpriteExplosion = new CSprite;
-    m_pSpriteExplosion->Load("../assets/explosion3.png", 25, 64, 64);
+    m_pSpriteExplosion->Load("../../assets/explosion3.png", 25, 64, 64);
     m_pSpriteExplosion->SetColorKey(0,0,0);
 
     m_pSpriteAsteroid = new CSprite;
-    m_pSpriteAsteroid->Load("../assets/Asteroid.png", 20, 64, 64);
+    m_pSpriteAsteroid->Load("../../assets/Asteroid.png", 20, 64, 64);
     m_pSpriteAsteroid->SetColorKey(255,0,255);
 
     m_pSpritePlayer = new CSprite;
-    m_pSpritePlayer->Load("../assets/Player.png",11,64,64);
+    m_pSpritePlayer->Load("../../assets/Player.png",11,64,64);
     m_pSpritePlayer->SetColorKey(255,0,255);
 
     m_pSpriteShot = new CSprite;
-    m_pSpriteShot->Load("../assets/Laser.png",0,64,64);
+    m_pSpriteShot->Load("../../assets/Laser.png",0,64,64);
     m_pSpriteShot->SetColorKey(255,0,255);
 
     m_pLebensenergie = new CText(200, 15, 15);

@@ -20,8 +20,8 @@ void DatabaseConnection::createTables()
 {
   
   // Open a database file
-  SQLite::Database    db(database_file, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
-  
+  SQLite::Database db(database_file, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
+
   // Compile a SQL query, containing one parameter (index 1)
   std::string query_string_environment =  R"(CREATE TABLE )";
   query_string_environment += DatabaseConnection::ENVIRONMENTS + "(";
@@ -43,6 +43,7 @@ void DatabaseConnection::createTables()
                              score_avg REAL,
                              score_std REAL,
                              score_min REAL,
+                             score_max REAL,
                              time_taken REAL,
                              FOREIGN KEY(environment_id_fk) REFERENCES ENVIRONMENTS(environment_id) ON DELETE CASCADE,
                              UNIQUE(environment_id_fk, alpha, gamma, epsilon_function) ON CONFLICT REPLACE))";
@@ -63,15 +64,23 @@ void DatabaseConnection::createTables()
                           reward REAL,
                           FOREIGN KEY(state_id_fk) REFERENCES STATES(state_id) ON DELETE CASCADE,
                           UNIQUE(state_id_fk, choice) ON CONFLICT REPLACE))";
-  
-  SQLite::Statement query_environment(db, query_string_environment);
-  SQLite::Statement query_test_cases(db, query_string_test_cases);
-  SQLite::Statement query_states(db, query_string_states);
-  SQLite::Statement query_actions(db, query_string_actions);
-  std::cout << query_environment.exec() << std::endl;
-  std::cout << query_test_cases.exec() << std::endl;
-  std::cout << query_states.exec() << std::endl;
-  std::cout << query_actions.exec() << std::endl;
+
+  if(!db.tableExists(ENVIRONMENTS)){
+    SQLite::Statement query_environment(db, query_string_environment);
+    std::cout << query_environment.exec() << std::endl;
+  }
+  if(!db.tableExists(TEST_CASES)){
+    SQLite::Statement query_test_cases(db, query_string_test_cases);
+    std::cout << query_test_cases.exec() << std::endl;
+  }
+  if(!db.tableExists(STATES)){
+    SQLite::Statement query_states(db, query_string_states);
+    std::cout << query_states.exec() << std::endl;
+  }
+  if(!db.tableExists(ACTIONS)){
+    SQLite::Statement query_actions(db, query_string_actions);
+    std::cout << query_actions.exec() << std::endl;
+  }
 }
 
 void DatabaseConnection::addRowEnvironment(const double reward_space_station_hit_multiplier,
@@ -116,6 +125,7 @@ void DatabaseConnection::addRowTestCases(const size_t environment_id,
                                          const double score_avg,
                                          const double score_std,
                                          const double score_min,
+                                         const double score_max,
                                          const double time_taken)
 {
   insert(TEST_CASES, {
@@ -126,6 +136,7 @@ void DatabaseConnection::addRowTestCases(const size_t environment_id,
            std::to_string(score_avg),
            std::to_string(score_std),
            std::to_string(score_min),
+           std::to_string(score_max),
            std::to_string(time_taken)
          });
 }

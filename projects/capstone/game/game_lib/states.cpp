@@ -115,8 +115,8 @@ size_t States::hashState2(const std::list<CAsteroid> &asteroid_list,
                          const float weapons_array_cooldown)
 {
     size_t hash = getAsteroidState(asteroid_list, player_pos);
-    hash <<= 1;
-    hash += (weapons_array_cooldown > 0.5f) ? 1u : 0u;
+//    hash <<= 1;
+//    hash += (weapons_array_cooldown > 0.5f) ? 1u : 0u;
     hash <<= 2;
     hash += space_station_health <= 0 ? 0 : space_station_health / 34 + 1;
     return hash;
@@ -137,6 +137,46 @@ size_t States::hashState3(const std::list<CAsteroid> &asteroid_list,
     return hash;
 }
 
+
+size_t States::hashState4(const std::list<CAsteroid> &asteroid_list,
+                         const float player_pos,
+                         const std::list<CShot> &shot_list,
+                         const int player_lives,
+                         const int space_station_health,
+                         const float weapons_array_cooldown)
+{
+    size_t hash = hashState3(asteroid_list, player_pos,
+                             shot_list, player_lives, space_station_health,
+                             weapons_array_cooldown);
+
+    std::vector<int> asteroid_per_spawnpoint(8, 0);
+    for(const auto& asteroid : asteroid_list){
+      asteroid_per_spawnpoint[(int(asteroid.GetXPos())-68)/100]++;
+    }
+
+    std::vector<int> shots_per_spawnpoint(8, 0);
+    for(const auto& shot : shot_list){
+      for(size_t spawn_point_x = 68; spawn_point_x < 800; spawn_point_x += 100 ){
+        if(shot.GetXPos() < spawn_point_x + 64 &&
+           shot.GetXPos() + 64 > spawn_point_x){
+          shots_per_spawnpoint[(spawn_point_x-68)/100]++;
+        }
+      }
+    }
+
+    int num_asteroids_getting_hit = 0;
+    for(size_t i = 0; i < asteroid_per_spawnpoint.size(); ++i){
+      num_asteroids_getting_hit += std::min(asteroid_per_spawnpoint[i],
+                                            shots_per_spawnpoint[i]);
+    }
+
+    hash <<= 4;
+    hash += std::min(16, num_asteroids_getting_hit);
+
+
+    return hash;
+}
+
 size_t States::hashState(const std::list<CAsteroid> &asteroid_list,
                          const float player_pos,
                          const std::list<CShot> &shot_list,
@@ -148,9 +188,11 @@ size_t States::hashState(const std::list<CAsteroid> &asteroid_list,
   if(environment_number == 1)
     return hashState1(asteroid_list, player_pos, shot_list, player_lives, space_station_health, weapons_array_cooldown);
   if(environment_number == 2)
-    return hashState1(asteroid_list, player_pos, shot_list, player_lives, space_station_health, weapons_array_cooldown);
+    return hashState2(asteroid_list, player_pos, shot_list, player_lives, space_station_health, weapons_array_cooldown);
   if(environment_number == 3)
-    return hashState1(asteroid_list, player_pos, shot_list, player_lives, space_station_health, weapons_array_cooldown);
+    return hashState3(asteroid_list, player_pos, shot_list, player_lives, space_station_health, weapons_array_cooldown);
+  if(environment_number == 4)
+    return hashState4(asteroid_list, player_pos, shot_list, player_lives, space_station_health, weapons_array_cooldown);
   throw false;
 }
 

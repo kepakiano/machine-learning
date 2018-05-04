@@ -59,6 +59,12 @@ private:
                              const int player_lives,
                              const int space_station_health,
                              const float weapons_array_cooldown);
+    static size_t hashState4(const std::list<CAsteroid> &asteroid_list,
+                             const float player_pos,
+                             const std::list<CShot>& shot_list,
+                             const int player_lives,
+                             const int space_station_health,
+                             const float weapons_array_cooldown);
     static size_t getAsteroidState(std::list<CAsteroid> asteroid_list,
                          const float player_position);
 };
