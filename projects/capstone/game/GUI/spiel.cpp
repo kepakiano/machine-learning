@@ -4,16 +4,6 @@
 #include "states.h"
 
 int main(int argc, char *argv[]){
-
-//    DatabaseConnection::createTables();
-//    DatabaseConnection::addRowEnvironment(2.0, 3.0, 3.0, 1);
-//    DatabaseConnection::addRowEnvironment(1.0, 3.0, 3.0, 1);
-//    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, 1) << std::endl;
-//    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, 1) << std::endl;
-//    std::cout << DatabaseConnection::getIdEnvironment(1.0, 3.0, 3.0, 1) << std::endl;
-
-//    return EXIT_SUCCESS;
-
     const int screen_width = 800;
     const int screen_height = 600;
   
@@ -26,6 +16,8 @@ int main(int argc, char *argv[]){
     size_t training_runs = 1;
     size_t test_runs =0;
     double epsilon = 1.0;
+    size_t test_cases_id;
+    size_t environment_number;
     if(argc == 4){
         training_runs = std::stoi(argv[1]);
         alpha = std::stod(argv[2]);
@@ -35,10 +27,28 @@ int main(int argc, char *argv[]){
         training_runs = 100;
         test_runs = 3;
     }
+    if(argc == 2){
+      test_cases_id = std::stoi(argv[1]);
+      Environment env = States::loadStates(test_cases_id);
+      alpha = env.alpha;
+      gamma = env.gamma;
+      environment_number = env.environment_id;
+      reinforcement_learning = true;
+      bot_is_learning = false;
+      std::cout << "Loaded environment with: alpha = " << alpha << ", gamma = " << gamma << ", environment_id = " << environment_number << std::endl;
+    }
     for(size_t i = 0; i < training_runs+test_runs; ++i){
         if(i == training_runs && reinforcement_learning){
             bot_is_learning = false;
             use_sdl_renderer = true;
+        }
+        if(reinforcement_learning){
+
+          Game.configureReinforcementLearning(bot_is_learning, alpha, gamma, epsilon,
+                                              0.0,
+                                              0.0, 0.0,
+                                              0.0, environment_number);
+
         }
         std::cout << "epsilon: " << epsilon << " ";
         Game.Init(use_sdl_renderer/*, reinforcement_learning, bot_is_learning, alpha, gamma, epsilon*/);

@@ -4,7 +4,7 @@
 
 #include <SQLiteCpp/Database.h>
 
-const std::string DatabaseConnection::database_file = "asteroids.db3";
+const std::string DatabaseConnection::database_file = "../ReinforcementLearningTraining/asteroids.db3";
 
 const std::string DatabaseConnection::ENVIRONMENTS = "ENVIRONMENTS";
 const std::string DatabaseConnection::TEST_CASES = "TEST_CASES";
@@ -198,6 +198,51 @@ void DatabaseConnection::safeStates(const std::unordered_map<StateHash, StatePtr
                        std::to_string(action->reward())});
     }
   }
+}
+
+Environment DatabaseConnection::loadStates(std::unordered_map<StateHash, StatePtr> &states, const size_t test_cases_id)
+{
+  SQLite::Database db(database_file, SQLite::OPEN_READONLY);
+  SQLite::Statement query_get_state(db, "SELECT * FROM " + STATES + " WHERE  test_cases_id_fk = ?");
+  query_get_state.bind(1, std::to_string(test_cases_id));
+
+  std::cout << "This should be 0: " << states.size() << " states" << std::endl;
+  while(query_get_state.executeStep()){
+    int states_id = query_get_state.getColumn(0);
+    int hash = query_get_state.getColumn(2);
+
+    SQLite::Statement query_get_actions(db, "SELECT * FROM " + ACTIONS + " WHERE  state_id_fk = ?");
+    query_get_actions.bind(1, std::to_string(states_id));
+
+    std::list<ActionPtr> actions;
+    while(query_get_actions.executeStep()){
+      ActionChoice choice = static_cast<ActionChoice>(query_get_actions.getColumn(2).getInt());
+      double reward = query_get_actions.getColumn(3).getDouble();
+
+      actions.push_back(std::make_shared<Action>(choice, reward));
+    }
+
+    StatePtr state = std::make_shared<State>(hash, actions);
+    states.insert(std::make_pair(hash, state));
+  }
+
+  std::cout << "Loaded " << states.size() << " states" << std::endl;
+
+  SQLite::Statement query_get_test_cases(db, "SELECT * FROM " + TEST_CASES + " WHERE test_cases_id = ?");
+  query_get_test_cases.bind(1, std::to_string(test_cases_id));
+  query_get_test_cases.executeStep();
+  int environment_id_fk = query_get_test_cases.getColumn(1);
+  double alpha = query_get_test_cases.getColumn(2);
+  double gamma = query_get_test_cases.getColumn(3);
+  alpha /= 100.0;
+  gamma /= 100.0;
+
+  SQLite::Statement query_get_env(db, "SELECT * FROM " + ENVIRONMENTS + " WHERE environment_id = ?");
+  query_get_env.bind(1, std::to_string(environment_id_fk));
+  query_get_env.executeStep();
+  int environment_id = std::stod(query_get_env.getColumn(5));
+
+  return Environment(environment_id, alpha, gamma);
 }
 
 void DatabaseConnection::insert(const std::string &table,

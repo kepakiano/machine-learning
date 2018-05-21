@@ -44,6 +44,8 @@ private:
   bool NewHighscore	();
   void SetDifficultyLevel(int schwierigkeitsgrad);
 
+  double distanceToAsteroidClosestToSpaceStation();
+
   SDL_Surface* load_image(string filename);
 
   Renderer *renderer;

@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include <boost/program_options.hpp>
-
+#include <iomanip>
 #include "databaseconnection.h"
 #include "framework.hpp"
 #include "game.hpp"
@@ -138,7 +138,6 @@ int main(int argc, char** argv){
   CGame Game(800, 600);
 
   const size_t training_runs = 10000;
-  const size_t test_runs = 100;
   double epsilon = 1.0;
 
   bool bot_is_learning = true;
@@ -150,10 +149,9 @@ int main(int argc, char** argv){
   const int environment_id = DatabaseConnection::getIdEnvironment(reward_space_station_hit_multiplier,
                                                                   reward_no_event, reward_ship_hit, reward_game_over,
                                                                   environment_number);
+  std::cout << std::fixed;
   std::vector<int> scores;
-  for(size_t i = 0; i < training_runs+test_runs; ++i){
-    if(i == training_runs)
-      bot_is_learning = false;
+  for(size_t i = 0; i < training_runs; ++i){
     Game.configureReinforcementLearning(bot_is_learning, alpha, gamma, epsilon,
                                         reward_space_station_hit_multiplier,
                                         reward_no_event, reward_ship_hit,
@@ -161,30 +159,33 @@ int main(int argc, char** argv){
     Game.Init(false);
 
     Game.Run();
-    std::cout << i << " epsilon: " << epsilon <<  " ";
+    std::cout << i << " epsilon: " << std::setprecision(4) << epsilon <<  " ";
     Game.GameOver();
-      if(i >= training_runs)
-        scores.push_back(Game.getScore());
     Game.Quit();
 
     epsilon = calculateEpsilon(epsilon_function, epsilon, i, training_runs);
   }
-  double score_min = *std::min_element(scores.begin(), scores.end());
-  double score_max = *std::max_element(scores.begin(), scores.end());
-  double sum = std::accumulate(scores.begin(), scores.end(), 0.0);
-  double mean = sum / scores.size();
 
-  double score_avg = mean;
 
-  std::vector<double> diff(scores.size());
-  std::transform(scores.begin(), scores.end(), diff.begin(), [mean](double x) { return x - mean; });
-
-  double sq_sum = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
-  double stdev = std::sqrt(sq_sum / scores.size());
-  double score_std = stdev;
-
-  DatabaseConnection::addRowTestCases(environment_id, alpha, gamma, epsilon_function, score_avg, score_std, score_min, score_max, 0.0);
+  DatabaseConnection::addRowTestCases(environment_id, alpha, gamma, epsilon_function, 0.0, 0.0, 0.0, 0.0, 0.0);
   const int test_cases_id = DatabaseConnection::getIdTestCases(environment_id, alpha, gamma, epsilon_function);
+
+
+//  auto saved_state = States::hashedStates();
+//  Environment env = States::loadStates(test_cases_id);
+//  alpha = env.alpha;
+//  gamma = env.gamma;
+//  environment_number = env.environment_id;
+  // Make sure the (de)serialization doesn't break anything
+//  for(const auto& p : States::hashedStates()){
+//    const auto& deserialized_state = p.second;
+//    const auto& original_state = saved_state.at(p.first);
+//    if(!(*deserialized_state == *original_state))
+//      throw std::string("Original and DB state are different");
+//  }
+
+
   States::saveStates(test_cases_id);
+
   return EXIT_SUCCESS;
 }

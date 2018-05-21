@@ -8,7 +8,7 @@ class RandomPlayer : public CPlayer
 public:
     RandomPlayer();
 
-    ActionChoice chooseAction() override;
+    ActionChoice chooseAction() const override;
 
 private:
     ActionChoice last_action;

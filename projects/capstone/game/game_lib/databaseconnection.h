@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "environment.h"
 #include "states.h"
 
 class DatabaseConnection
@@ -42,6 +43,9 @@ public:
     static int getIdStates(const size_t test_cases_id, const size_t hash);
 
     static void safeStates(const std::unordered_map<StateHash, StatePtr>& states,
+                          const size_t test_cases_id);
+
+    static Environment loadStates(std::unordered_map<StateHash, StatePtr>& states,
                           const size_t test_cases_id);
 private:
     static const std::string database_file;

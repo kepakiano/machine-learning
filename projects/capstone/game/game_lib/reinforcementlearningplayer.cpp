@@ -26,7 +26,7 @@ ReinforcementLearningPlayer::ReinforcementLearningPlayer(bool learning,
  * @brief ReinforcementLearningPlayer::getBestActions Given the hash of a State
  * this method returns all the actions with the best rewards.
  */
-std::list<ActionPtr> ReinforcementLearningPlayer::getBestActions(const StatePtr& state)
+std::list<ActionPtr> ReinforcementLearningPlayer::getBestActions(const StatePtr& state) const
 {
     std::list<ActionPtr> best_actions;
     for(const auto& action : state->actions()){
@@ -45,37 +45,50 @@ std::list<ActionPtr> ReinforcementLearningPlayer::getBestActions(const StatePtr&
     return best_actions;
 }
 
-ActionChoice ReinforcementLearningPlayer::chooseAction()
+ActionPtr ReinforcementLearningPlayer::chooseAction(const StatePtr &state) const
 {
-    if(learning && getRandomDoubleBetween(0.0, 1.0) < epsilon){
-        const auto& valid_actions = current_state->actions();
-        current_action = (*randomChoice(valid_actions.begin(), valid_actions.end()));
-    }
-    else {
-        const auto& best_actions = getBestActions(current_state);
-        current_action = (*randomChoice(best_actions.begin(), best_actions.end()));
-    }
-    return current_action->choice();
+  ActionPtr action = nullptr;
+  if(learning && getRandomDoubleBetween(0.0, 1.0) < epsilon){
+      const auto& valid_actions = state->actions();
+      action = (*randomChoice(valid_actions.begin(), valid_actions.end()));
+  }
+  else {
+      const auto& best_actions = getBestActions(state);
+      action = (*randomChoice(best_actions.begin(), best_actions.end()));
+  }
+  return action;
+}
+
+ActionChoice ReinforcementLearningPlayer::chooseAction() const
+{
+  return chooseAction(current_state)->choice();
 }
 
 void ReinforcementLearningPlayer::learn(const double reward,
                                         const StatePtr& new_state)
 {
+  if(!learning)
+    return;
+
     const double next_Q = getBestActions(new_state).front()->reward();
+//    const double next_Q = chooseAction(new_state)->reward();
     const double Q_st_at = current_action->reward();
     const double new_reward = Q_st_at + alpha * (reward + gamma * next_Q - Q_st_at);
 
     current_action->setReward(new_reward);
 }
 
-void ReinforcementLearningPlayer::computeState(const std::list<CAsteroid> &asteroid_list)
+void ReinforcementLearningPlayer::computeState(const std::list<CAsteroid> &asteroid_list,
+                                               const std::list<CExplosion> &explosion_list)
 {
     current_state = States::getState(asteroid_list,
                  m_fXPos,
                  m_ShotList,
+                                     explosion_list,
                  m_Leben,
                  m_Lebensenergie_Raumstation,
                  m_fShotCooldownTimer,
                  environment_number
-                 );    
+                                     );
 }
+

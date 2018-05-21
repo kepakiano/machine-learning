@@ -16,7 +16,7 @@ void CPlayer::Init(){
 	m_Lebensenergie_Raumstation = 100;
 	m_LebensenergieTimer = 0.0f;
 
-    m_fSpawnSchutz = 0.0f;
+//    m_fSpawnSchutz = 0.0f;
     m_fSpawnSchutzTimer = 0.0f;
 } // Init
 
@@ -36,9 +36,8 @@ void CPlayer::Reset(){
 	m_fAnimPhase = 5.0f;
   
 	m_Leben--;
-  
-	m_bShotLock = false;
-    m_fSpawnSchutz = 0.0f;
+
+//    m_fSpawnSchutz = 0.0f;
     m_fSpawnSchutzTimer = 0.0f;
 
     m_fShotCooldownTimer = 0.5f;
@@ -95,7 +94,6 @@ void CPlayer::ProcessAction(const ActionChoice &action, const double seconds){
     if (action == SHOOT){
         CShot shot(m_fXPos, m_fYPos);
         m_ShotList.push_back(shot);
-        m_bShotLock = true;
         m_fShotCooldownTimer = 0.0f;
 	}
 } // ProcessShooting

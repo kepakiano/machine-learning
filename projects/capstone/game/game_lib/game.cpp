@@ -18,6 +18,8 @@
 #include "fake_renderer.hpp"
 #include "utilities.hpp"
 
+#include "states.h"
+
 using namespace std;
 
 CGame::CGame(const int screen_width, const int screen_height)
@@ -25,7 +27,7 @@ CGame::CGame(const int screen_width, const int screen_height)
   m_pPlayer = nullptr;
 }
 
-void CGame::Init(const bool use_sdl){
+void CGame::  Init(const bool use_sdl){
   if(m_pPlayer == nullptr){
     m_pPlayer = new HumanPlayer();
   }
@@ -90,8 +92,27 @@ void CGame::Quit(){
   renderer->Quit();
 } // Quit
 
+double CGame::distanceToAsteroidClosestToSpaceStation(){
+  auto asteroid_list = m_AsteroidList;
+
+  double distance = 0;
+
+  if(asteroid_list.size() == 0)
+    return distance;
+
+  asteroid_list.sort(
+        [](const CAsteroid &a1, const CAsteroid &a2
+        ){
+    return a1.GetYPos() > a2.GetYPos();
+  });
+
+  distance = std::max(0.0, std::abs(m_pPlayer->GetXPosition() - double(asteroid_list.front().GetXPos())) - 64.0);
+
+  return distance;
+}
+
 void CGame::Run(){
-  m_pPlayer->computeState(m_AsteroidList);
+  m_pPlayer->computeState(m_AsteroidList, m_ExplosionList);
   while(m_bGameRun == true && m_pPlayer->GetLeben() > 0 && m_pPlayer->GetLebensenergie_Raumstation() > 0){
     m_pTimer->Update();
     auto start_of_frame = std::chrono::high_resolution_clock::now();
@@ -109,10 +130,16 @@ void CGame::Run(){
       // Let the player analyze the current state and make a decision
       // on what do to next
       ActionChoice action = m_pPlayer->chooseAction();
+      StatePtr old_state = m_pPlayer->getCurrentState();
 
       // Update the environment given the player's action
       m_pPlayer->UpdateShots(m_pTimer->GetElapsed());
+      const double pos_pre = m_pPlayer->GetXPosition();
       m_pPlayer->Update(m_pTimer->GetElapsed(), action);
+      const double pos_post = m_pPlayer->GetXPosition();
+
+//      std::cout << "distance travelled: " << pos_post-pos_pre << std::endl;
+
       UpdateExplosions();
       UpdateAsteroids();
       SpawnAsteroids();
@@ -120,12 +147,16 @@ void CGame::Run(){
       // Compute the reward the action (or a previous one) got the player
       double reward = CheckCollisions();
 
+      reward -= distanceToAsteroidClosestToSpaceStation()/2.0;
+
       if(!(m_bGameRun == true && m_pPlayer->GetLeben() > 0 && m_pPlayer->GetLebensenergie_Raumstation() > 0))
         reward += rewardGameOver();
 
       // Update the player's current state
-      m_pPlayer->computeState(m_AsteroidList);
+      m_pPlayer->computeState(m_AsteroidList, m_ExplosionList);
       StatePtr new_state = m_pPlayer->getCurrentState();
+      if(old_state != nullptr)
+        m_pPlayer->setCurrentAction(old_state->action(action));
 
       // Let the player draw knowledge from the action it chose
       m_pPlayer->learn(reward, new_state);
@@ -194,15 +225,10 @@ double CGame::CheckCollisions(){
     for(ItShot = ShotList.begin(); ItShot != ShotList.end(); ++ItShot){
       Rectangle RectShot = ItShot->GetRect();
 
-      // Überschneiden sich die Rechtecke eines Asteroiden und eines Schusses?
-      if	(RectShot.y < RectAsteroid.y + RectAsteroid.h &&
-           RectShot.y + RectShot.h > RectAsteroid.y &&
-           RectShot.x < RectAsteroid.x + 64 &&
-           RectShot.x + RectShot.w > RectAsteroid.x){
 
+      if(RectShot.overlaps(RectAsteroid)){
         ItAsteroid->SetAlive(false);
         ItShot->SetAlive(false);
-        std::cout << ItShot->getLifetime() << std::endl;
         const int punkte = m_pPlayer->BerechnePunkte(RectAsteroid.y);
         renderer->handleGameEvent(UPDATE_SCORE_TEXT);
         SpawnExplosion(RectAsteroid.x, RectAsteroid.y, m_SpeedAsteroid/2.0f);
@@ -218,7 +244,7 @@ double CGame::CheckCollisions(){
       m_pPlayer->Raumstation_Getroffen();
       renderer->handleGameEvent(UPDATE_ENERGY_TEXT);
 
-      reward -= m_pPlayer->getDamageToSpaceStation();
+      reward += m_pPlayer->getDamageToSpaceStation() * rewardSpaceStationHitMultiplier();
     }
     if(ItAsteroid->IsAlive())
       ItAsteroid++;

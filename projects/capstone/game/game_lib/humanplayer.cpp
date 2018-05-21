@@ -7,11 +7,9 @@ HumanPlayer::HumanPlayer()
 
 }
 
-ActionChoice HumanPlayer::chooseAction()
+ActionChoice HumanPlayer::chooseAction() const
 {
-    if(g_pFramework->KeyDown(SDLK_SPACE) == false)
-            m_bShotLock = false;
-    if (g_pFramework->KeyDown(SDLK_SPACE) && m_bShotLock == false && isShootingPossible())
+    if (g_pFramework->KeyDown(SDLK_SPACE) && isShootingPossible())
         return ActionChoice::SHOOT;
     if(g_pFramework->KeyDown(SDLK_LEFT))
         return ActionChoice::MOVE_LEFT;

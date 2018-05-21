@@ -15,15 +15,18 @@ public:
                                 size_t environment_number);
     virtual ~ReinforcementLearningPlayer() override = default;
 
-    void computeState(const std::list<CAsteroid> & asteroid_list) override;
+    void computeState(const std::list<CAsteroid> & asteroid_list,
+                      const std::list<CExplosion> &explosion_list) override;
     virtual StatePtr getCurrentState() const override {return current_state;}
-    ActionChoice chooseAction() override;
+    ActionChoice chooseAction() const override;
+    ActionPtr chooseAction(const StatePtr& state) const;
     void learn(const double reward,
                const StatePtr& new_state) override;
-    
-    void reset() {
-//        epsilon *= 0.99;
+
+    virtual void setCurrentAction(ActionPtr action) override {
+      current_action = action;
     }
+
 
 private:
     double epsilon;
@@ -35,7 +38,7 @@ private:
     size_t environment_number;
     
     State buildState(const std::list<CAsteroid> &asteroid_list);
-    std::list<ActionPtr> getBestActions(const StatePtr &state);
+    std::list<ActionPtr> getBestActions(const StatePtr &state) const;
 
     StatePtr current_state;
     ActionPtr current_action;    
