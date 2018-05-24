@@ -45,6 +45,11 @@ public:
     static void safeStates(const std::unordered_map<StateHash, StatePtr>& states,
                           const size_t test_cases_id);
 
+    static void addScore(const size_t test_cases_id,
+                         const double score_min,
+                         const double score_max,
+                         const double score_avg, const double score_std);
+
     static Environment loadStates(std::unordered_map<StateHash, StatePtr>& states,
                           const size_t test_cases_id);
 private:

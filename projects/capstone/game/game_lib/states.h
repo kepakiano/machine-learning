@@ -52,6 +52,7 @@ private:
     static void stateExplosions(const StatePtr& state, StateHash &hash);
     static void stateNextAsteroidThatDoesNotGetHit(const StatePtr& state, StateHash &hash);
     static void stateAsteroidsGoingToHitTheShip(const StatePtr& state, StateHash &hash);
+    static void stateNextAsteroidThatDoesNotGetHitAndIsReachable(const StatePtr& state, StateHash &hash);
 public:
     static size_t hashState4(const StatePtr &state);
     static size_t   getAsteroidState(std::list<CAsteroid> asteroid_list,

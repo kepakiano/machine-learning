@@ -18,6 +18,8 @@ public:
     m_bIsAlive = bIsAlive;
   }
 
+  float speed() const {return m_speed;}
+
   const Rectangle& getRect() const {return rectangle;}
 
   float GetXPos() const {return m_fXPos;}

@@ -200,6 +200,19 @@ void DatabaseConnection::safeStates(const std::unordered_map<StateHash, StatePtr
   }
 }
 
+void DatabaseConnection::addScore(const size_t test_cases_id, const double score_min, const double score_max, const double score_avg, const double score_std)
+{
+
+  SQLite::Database db(database_file, SQLite::OPEN_READWRITE);
+  SQLite::Statement query_get_test_cases(db, "UPDATE " + TEST_CASES + " SET score_avg = ?, score_std = ?, score_min = ?, score_max = ? WHERE test_cases_id = ?");
+  query_get_test_cases.bind(1, std::to_string(score_avg));
+  query_get_test_cases.bind(2, std::to_string(score_std));
+  query_get_test_cases.bind(3, std::to_string(score_min));
+  query_get_test_cases.bind(4, std::to_string(score_max));
+  query_get_test_cases.bind(5, std::to_string(test_cases_id));
+  query_get_test_cases.executeStep();
+}
+
 Environment DatabaseConnection::loadStates(std::unordered_map<StateHash, StatePtr> &states, const size_t test_cases_id)
 {
   SQLite::Database db(database_file, SQLite::OPEN_READONLY);

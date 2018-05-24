@@ -71,6 +71,7 @@ int main(int argc, char** argv){
   double stdev = std::sqrt(sq_sum / scores.size());
   double score_std = stdev;
 
+  DatabaseConnection::addScore(test_cases_id, score_min, score_max, score_avg, score_std);
   std::cout << score_avg << " " << score_min << " " << score_max << std::endl;
 
   return EXIT_SUCCESS;

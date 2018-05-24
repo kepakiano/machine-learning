@@ -9,9 +9,8 @@ std::unordered_map<StateHash, StatePtr> States::hashed_states_;
  * 1. Add information where the next unshot asteroid _that can be reached_ is
  * 2. Make the agent aware that there might be an asteroid behind the next unshot asteroid
  * 3. Add player's lives to state
- *
+ * 4. Add the info that there is an asteroid in front of the ship
  */
-
 
 std::list<ActionChoice> States::validActions(const float player_pos,
                                              const float weapons_array_cooldown)
@@ -135,7 +134,7 @@ void States::stateExplosions(const StatePtr& state, StateHash &hash){
 
 void States::stateNextAsteroidThatDoesNotGetHit(const StatePtr& state, StateHash &hash)
 {
-  auto asteroid_list = state->asteroid_list();
+  std::list<CAsteroid> asteroid_list = state->asteroid_list();
   hash <<= 2;
 
   asteroid_list.sort(
@@ -144,7 +143,7 @@ void States::stateNextAsteroidThatDoesNotGetHit(const StatePtr& state, StateHash
     return a1.GetYPos() > a2.GetYPos();
   });
 
-  auto shot_list = state->shot_list();
+  std::list<CShot> shot_list = state->shot_list();
 
   if(asteroid_list.size() >= 2)
     if(asteroid_list.front().getRect().y < asteroid_list.back().getRect().y)
@@ -168,29 +167,57 @@ void States::stateNextAsteroidThatDoesNotGetHit(const StatePtr& state, StateHash
 //      asteroids_iter++;
 //  }
 
-
   const double overlap_pixels = 2.0;
 
   for(const auto& asteroid : asteroid_list){
-    auto RectAsteroid = asteroid.getRect();
+    const auto& RectAsteroid = asteroid.getRect();
     for(const auto& shot : shot_list){
-      auto RectShot = shot.GetRect();
+      const auto& RectShot = shot.GetRect();
       if	(RectShot.overlapsX(RectAsteroid)){
         continue;
-        throw std::string("Asteroid overlaps shot, should not happen!");
+//        throw std::string("Asteroid overlaps shot, should not happen!");
       }
       if(RectAsteroid.overlapsX(Rectangle(state->player_pos(), 0, 64, 64), overlap_pixels)){
         hash += 1;
+        std::cout << "in front" << std::endl;
       }
       else if(state->player_pos() > RectAsteroid.x){
         hash += 2;
+        std::cout << "left" << std::endl;
       }
       else{
         hash += 3;
+        std::cout << "right" << std::endl;
       }
       return;
     }
   }
+
+//  for(const auto& asteroid : asteroid_list){
+//    const auto& RectAsteroid = asteroid.getRect();
+//    bool is_hit = false;
+//    for(const auto& shot : shot_list){
+//      const auto& RectShot = shot.GetRect();
+//      if	(RectShot.overlapsX(RectAsteroid)){
+//        is_hit = true;
+//        break;
+////        throw std::string("Asteroid overlaps shot, should not happen!");
+//      }
+//    }
+//    if(is_hit)
+//      continue;
+
+//    if(RectAsteroid.overlapsX(Rectangle(state->player_pos(), 0, 64, 64), overlap_pixels)){
+//      hash += 1;
+//    }
+//    else if(state->player_pos() > RectAsteroid.x){
+//      hash += 2;
+//    }
+//    else{
+//      hash += 3;
+//    }
+//    return;
+//  }
 }
 
 void stateWeaponsArray(const StatePtr& state, StateHash &hash){
@@ -239,7 +266,6 @@ size_t States::hashState1(const StatePtr &state)
 {
   StateHash hash = 1;
   statePossibleActions(state, hash);
-//  stateAsteroids(state, hash);
   stateWeaponsArray(state, hash);
   stateNextAsteroidThatDoesNotGetHit(state, hash);
   stateAsteroidsGoingToHitTheShip(state, hash);
@@ -248,58 +274,31 @@ size_t States::hashState1(const StatePtr &state)
 
 size_t States::hashState2(const StatePtr &state)
 {
+  StateHash hash = hashState1(state);
+  statePlayerLives(state, hash);
+  return hash;
 
 }
 
 size_t States::hashState3(const StatePtr &state)
 {
-  size_t hash = hashState2(state);
-  hash <<= 1;
-  hash += state->player_lives() > 1;
+  StateHash hash = hashState2(state);
+  statePlayerLives(state, hash);
   return hash;
 }
-
 
 size_t States::hashState4(const StatePtr &state)
 {
   size_t hash = hashState3(state);
-
-  std::vector<int> asteroid_per_spawnpoint(8, 0);
-  for(const auto& asteroid : state->asteroid_list()){
-    asteroid_per_spawnpoint[(int(asteroid.GetXPos())-68)/100]++;
-  }
-
-  std::vector<int> shots_per_spawnpoint(8, 0);
-  for(const auto& shot : state->shot_list()){
-    for(size_t spawn_point_x = 68; spawn_point_x < 800; spawn_point_x += 100 ){
-      if(shot.GetXPos() < spawn_point_x + 64 &&
-         shot.GetXPos() + 64 > spawn_point_x){
-        shots_per_spawnpoint[(spawn_point_x-68)/100]++;
-      }
-    }
-  }
-
-  int num_asteroids_getting_hit = 0;
-  for(size_t i = 0; i < asteroid_per_spawnpoint.size(); ++i){
-    num_asteroids_getting_hit += std::min(asteroid_per_spawnpoint[i],
-                                          shots_per_spawnpoint[i]);
-  }
-
-  hash <<= 4;
-  hash += std::min(16, num_asteroids_getting_hit);
-
-  std::cout << num_asteroids_getting_hit << std::endl;
+  stateSpaceStationHealth(state, hash);
 
   return hash;
 }
 
 size_t States::hashState5(const StatePtr &state)
 {
-  size_t hash = hashState3(state);
-
-  hash <<= 4;
-  hash += state->player_pos() / 16;
-
+  size_t hash = hashState4(state);
+  stateExplosions(state, hash);
   return hash;
 }
 

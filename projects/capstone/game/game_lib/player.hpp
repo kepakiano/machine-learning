@@ -59,6 +59,8 @@ public:
   float getWeaponArrayCooldown() const{
     return m_fShotCooldownTimer;
   }
+
+  float speed() const {return m_fSpeed;}
 protected:
   bool isShootingPossible() const{
     return m_fShotCooldownTimer >= m_fShotCooldown;
@@ -87,6 +89,8 @@ protected:
 
   unsigned int m_Leben;
   unsigned int m_Lebensenergie_Raumstation;
+
+  const float m_fSpeed;
 
   list<CShot> m_ShotList;
 };

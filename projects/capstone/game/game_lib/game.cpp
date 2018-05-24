@@ -94,8 +94,27 @@ void CGame::Quit(){
 
 double CGame::distanceToAsteroidClosestToSpaceStation(){
   auto asteroid_list = m_AsteroidList;
+//  auto shot_list
 
   double distance = 0;
+
+//    auto asteroids_iter = asteroid_list.begin();
+//    while(asteroids_iter != asteroid_list.end()){
+//      auto shots_iter = shot_list.begin();
+//      bool asteroid_iter_was_advanced = false;
+//      while(shots_iter != shot_list.end()){
+//        if(shots_iter->GetRect().overlapsX(asteroids_iter->getRect())){
+//          shots_iter = shot_list.erase(shots_iter);
+//          asteroids_iter = asteroid_list.erase(asteroids_iter);
+//          asteroid_iter_was_advanced = true;
+//        }
+//        else{
+//          shots_iter++;
+//        }
+//      }
+//      if(!asteroid_iter_was_advanced)
+//        asteroids_iter++;
+//    }
 
   if(asteroid_list.size() == 0)
     return distance;
