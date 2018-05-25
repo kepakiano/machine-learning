@@ -23,6 +23,8 @@ public:
 
 
     static std::unordered_map<StateHash, StatePtr> hashedStates() {return hashed_states_;}
+    static void removeAsteroidsAndShotsThatWillGetHit(std::list<CAsteroid>& asteroid_list, std::list<CShot>& shot_list);
+    static void removeUnreachableAsteroids(std::list<CAsteroid>& asteroid_list, const double player_pos);
 private:
     static std::unordered_map<StateHash, StatePtr> hashed_states_;
 

@@ -94,38 +94,28 @@ void CGame::Quit(){
 
 double CGame::distanceToAsteroidClosestToSpaceStation(){
   auto asteroid_list = m_AsteroidList;
-//  auto shot_list
+  auto shot_list = m_pPlayer->GetShotList();
 
   double distance = 0;
 
-//    auto asteroids_iter = asteroid_list.begin();
-//    while(asteroids_iter != asteroid_list.end()){
-//      auto shots_iter = shot_list.begin();
-//      bool asteroid_iter_was_advanced = false;
-//      while(shots_iter != shot_list.end()){
-//        if(shots_iter->GetRect().overlapsX(asteroids_iter->getRect())){
-//          shots_iter = shot_list.erase(shots_iter);
-//          asteroids_iter = asteroid_list.erase(asteroids_iter);
-//          asteroid_iter_was_advanced = true;
-//        }
-//        else{
-//          shots_iter++;
-//        }
-//      }
-//      if(!asteroid_iter_was_advanced)
-//        asteroids_iter++;
-//    }
+  States::removeAsteroidsAndShotsThatWillGetHit(asteroid_list, shot_list);
+  States::removeUnreachableAsteroids(asteroid_list, m_pPlayer->GetXPosition());
 
-  if(asteroid_list.size() == 0)
+  if(asteroid_list.size() == 0){
+//    std::cout << "no asteroid" << std::endl;
     return distance;
+  }
 
-  asteroid_list.sort(
-        [](const CAsteroid &a1, const CAsteroid &a2
-        ){
-    return a1.GetYPos() > a2.GetYPos();
-  });
+//  if(std::abs(asteroid_list.front().getRect().x-m_pPlayer->GetXPosition()) < 54)
+//    std::cout << "front" << std::endl;
+//  else if(asteroid_list.front().getRect().x > m_pPlayer->GetXPosition()){
+//    std::cout << "right" << std::endl;
+//  }
+//  else
+//    std::cout << "left" << std::endl;
 
   distance = std::max(0.0, std::abs(m_pPlayer->GetXPosition() - double(asteroid_list.front().GetXPos())) - 64.0);
+
 
   return distance;
 }
@@ -157,7 +147,7 @@ void CGame::Run(){
       m_pPlayer->Update(m_pTimer->GetElapsed(), action);
       const double pos_post = m_pPlayer->GetXPosition();
 
-//      std::cout << "distance travelled: " << pos_post-pos_pre << std::endl;
+      //      std::cout << "distance travelled: " << pos_post-pos_pre << std::endl;
 
       UpdateExplosions();
       UpdateAsteroids();

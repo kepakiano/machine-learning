@@ -45,39 +45,111 @@ void States::statePossibleActions(const StatePtr& state, StateHash &hash){
 void States::stateAsteroidsGoingToHitTheShip(const StatePtr& state, StateHash &hash){
   hash <<= 1;
 
-  const float overlap = 3.0f;
-  for(const auto& asteroid : state->asteroid_list()){
-    if(asteroid.getRect().y > 460 &&
-       asteroid.getRect().x + asteroid.getRect().w + overlap > state->player_pos() &&
-       asteroid.getRect().x + asteroid.getRect().w < state->player_pos()){
-      hash += 1;
-      break;
+
+  const double update_time = 0.016666;
+  std::vector<bool> ship_gets_hit = {false, false, false};
+  std::vector<double> new_ship_positions = {state->player_pos() + 300.0 * update_time, state->player_pos(), state->player_pos() - 300.0 * update_time};
+  auto asteroid_list = state->asteroid_list();
+  for(auto& asteroid : asteroid_list){
+    asteroid.Update(update_time);
+    const auto& RectAsteroid = asteroid.getRect();
+    for(size_t i = 0; i < new_ship_positions.size(); ++i){
+      const double& player_pos = new_ship_positions[i];
+
+      if(RectAsteroid.y > 466 &&
+         RectAsteroid.x + 64 - 10 > player_pos &&
+         RectAsteroid.x < (player_pos + 54)){
+        ship_gets_hit[i] = true;
+      }
     }
   }
-
-  hash <<= 1;
-  for(const auto& asteroid : state->asteroid_list()){
-    if(asteroid.getRect().y > 460 &&
-       asteroid.getRect().x - overlap < state->player_pos() + 64 &&
-       asteroid.getRect().x > state->player_pos() + 64){
-      hash += 1;
-      break;
-    }
+  for(bool collision : ship_gets_hit){
+    hash <<= 1;
+    hash += collision;
   }
 
-  hash <<= 1;
-  for(const auto& asteroid : state->asteroid_list()){
-    if(asteroid.getRect().y > 460 &&
-       asteroid.getRect().overlapsX(Rectangle(state->player_pos(), 0, 64, 64))){
-      hash += 1;
-      break;
+//  const float overlap = 3.0f;
+//  for(const auto& asteroid : state->asteroid_list()){
+//    if(asteroid.getRect().y > 460 &&
+//       asteroid.getRect().x + asteroid.getRect().w + overlap > state->player_pos() &&
+//       asteroid.getRect().x + asteroid.getRect().w < state->player_pos()){
+//      hash += 1;
+//      break;
+//    }
+//  }
+
+//  hash <<= 1;
+//  for(const auto& asteroid : state->asteroid_list()){
+//    if(asteroid.getRect().y > 460 &&
+//       asteroid.getRect().x - overlap < state->player_pos() + 64 &&
+//       asteroid.getRect().x > state->player_pos() + 64){
+//      hash += 1;
+//      break;
+//    }
+//  }
+
+//  hash <<= 1;
+//  for(const auto& asteroid : state->asteroid_list()){
+//    if(asteroid.getRect().y > 460 &&
+//       asteroid.getRect().overlapsX(Rectangle(state->player_pos(), 0, 64, 64))){
+//      hash += 1;
+//      break;
+//    }
+//  }
+}
+
+void States::removeUnreachableAsteroids(std::list<CAsteroid>& asteroid_list, const double player_pos)
+{
+  return;
+  for(auto iter = asteroid_list.begin(); iter != asteroid_list.end();){
+    if((466-iter->getRect().y)/iter->speed() < (std::abs(iter->getRect().x -player_pos)-54)/300.0){
+      iter = asteroid_list.erase(iter);
+    }
+    else{
+      ++iter;
     }
   }
 
 }
 
+void States::removeAsteroidsAndShotsThatWillGetHit(std::list<CAsteroid> &asteroid_list, std::list<CShot> &shot_list)
+{
+  asteroid_list.sort(
+        [](const CAsteroid &a1, const CAsteroid &a2
+        ){
+    return a1.GetYPos() > a2.GetYPos();
+  });
+
+  auto asteroids_iter = asteroid_list.begin();
+  while(asteroids_iter != asteroid_list.end()){
+    auto shots_iter = shot_list.begin();
+    bool asteroid_iter_was_advanced = false;
+    while(shots_iter != shot_list.end()){
+      if(shots_iter->GetRect().overlapsX(asteroids_iter->getRect()) &&
+         shots_iter->GetRect().y > asteroids_iter->getRect().y){
+        shots_iter = shot_list.erase(shots_iter);
+        asteroids_iter = asteroid_list.erase(asteroids_iter);
+        asteroid_iter_was_advanced = true;
+
+        if(asteroids_iter == asteroid_list.end())
+          return;
+      }
+      else{
+        shots_iter++;
+      }
+    }
+    if(!asteroid_iter_was_advanced)
+      asteroids_iter++;
+  }
+}
+
 void States::stateAsteroids(const StatePtr& state, StateHash &hash){
   auto asteroid_list = state->asteroid_list();
+  auto shot_list = state->shot_list();
+
+  removeAsteroidsAndShotsThatWillGetHit(asteroid_list, shot_list);
+  removeUnreachableAsteroids(asteroid_list, state->player_pos());
+
   asteroid_list.sort(
         [](const CAsteroid &a1, const CAsteroid &a2
         ){
@@ -121,10 +193,6 @@ void States::stateAsteroids(const StatePtr& state, StateHash &hash){
   hash <<= 1;
   if(there_is_an_asteroid_in_front_of_the_ship)
     hash += 1u;
-  hash <<= 2;
-  hash += next_asteroid_position;
-  hash <<= 2;
-  hash += second_next_asteroid_position;
 }
 
 void States::stateExplosions(const StatePtr& state, StateHash &hash){
@@ -135,89 +203,38 @@ void States::stateExplosions(const StatePtr& state, StateHash &hash){
 void States::stateNextAsteroidThatDoesNotGetHit(const StatePtr& state, StateHash &hash)
 {
   std::list<CAsteroid> asteroid_list = state->asteroid_list();
-  hash <<= 2;
-
-  asteroid_list.sort(
-        [](const CAsteroid &a1, const CAsteroid &a2
-        ){
-    return a1.GetYPos() > a2.GetYPos();
-  });
-
   std::list<CShot> shot_list = state->shot_list();
+
+  removeAsteroidsAndShotsThatWillGetHit(asteroid_list, shot_list);
+  removeUnreachableAsteroids(asteroid_list, state->player_pos());
 
   if(asteroid_list.size() >= 2)
     if(asteroid_list.front().getRect().y < asteroid_list.back().getRect().y)
       throw std::string("List is not properly sorted");
 
-//  auto asteroids_iter = asteroid_list.begin();
-//  while(asteroids_iter != asteroid_list.end()){
-//    auto shots_iter = shot_list.begin();
-//    bool asteroid_iter_was_advanced = false;
-//    while(shots_iter != shot_list.end()){
-//      if(shots_iter->GetRect().overlapsX(asteroids_iter->getRect())){
-//        shots_iter = shot_list.erase(shots_iter);
-//        asteroids_iter = asteroid_list.erase(asteroids_iter);
-//        asteroid_iter_was_advanced = true;
-//      }
-//      else{
-//        shots_iter++;
-//      }
-//    }
-//    if(!asteroid_iter_was_advanced)
-//      asteroids_iter++;
-//  }
-
   const double overlap_pixels = 2.0;
 
+  hash <<= 2;
   for(const auto& asteroid : asteroid_list){
     const auto& RectAsteroid = asteroid.getRect();
     for(const auto& shot : shot_list){
       const auto& RectShot = shot.GetRect();
-      if	(RectShot.overlapsX(RectAsteroid)){
-        continue;
-//        throw std::string("Asteroid overlaps shot, should not happen!");
+      if	(RectShot.overlapsX(RectAsteroid) && RectAsteroid.y < RectShot.y){
+//        continue;
+        throw std::string("Asteroid overlaps shot, should not happen!");
       }
       if(RectAsteroid.overlapsX(Rectangle(state->player_pos(), 0, 64, 64), overlap_pixels)){
         hash += 1;
-        std::cout << "in front" << std::endl;
       }
       else if(state->player_pos() > RectAsteroid.x){
         hash += 2;
-        std::cout << "left" << std::endl;
       }
       else{
         hash += 3;
-        std::cout << "right" << std::endl;
       }
       return;
     }
   }
-
-//  for(const auto& asteroid : asteroid_list){
-//    const auto& RectAsteroid = asteroid.getRect();
-//    bool is_hit = false;
-//    for(const auto& shot : shot_list){
-//      const auto& RectShot = shot.GetRect();
-//      if	(RectShot.overlapsX(RectAsteroid)){
-//        is_hit = true;
-//        break;
-////        throw std::string("Asteroid overlaps shot, should not happen!");
-//      }
-//    }
-//    if(is_hit)
-//      continue;
-
-//    if(RectAsteroid.overlapsX(Rectangle(state->player_pos(), 0, 64, 64), overlap_pixels)){
-//      hash += 1;
-//    }
-//    else if(state->player_pos() > RectAsteroid.x){
-//      hash += 2;
-//    }
-//    else{
-//      hash += 3;
-//    }
-//    return;
-//  }
 }
 
 void stateWeaponsArray(const StatePtr& state, StateHash &hash){
@@ -268,7 +285,7 @@ size_t States::hashState1(const StatePtr &state)
   statePossibleActions(state, hash);
   stateWeaponsArray(state, hash);
   stateNextAsteroidThatDoesNotGetHit(state, hash);
-  stateAsteroidsGoingToHitTheShip(state, hash);
+//  stateAsteroidsGoingToHitTheShip(state, hash);
   return hash;
 }
 
