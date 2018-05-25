@@ -3,7 +3,7 @@
 #include <cassert>
 #include "databaseconnection.h"
 
-std::unordered_map<StateHash, StatePtr> States::hashed_states_;
+//std::unordered_map<StateHash, StatePtr> States::hashed_states_;
 
 /**
  * 1. Add information where the next unshot asteroid _that can be reached_ is
@@ -100,7 +100,6 @@ void States::stateAsteroidsGoingToHitTheShip(const StatePtr& state, StateHash &h
 
 void States::removeUnreachableAsteroids(std::list<CAsteroid>& asteroid_list, const double player_pos)
 {
-  return;
   for(auto iter = asteroid_list.begin(); iter != asteroid_list.end();){
     if((466-iter->getRect().y)/iter->speed() < (std::abs(iter->getRect().x -player_pos)-54)/300.0){
       iter = asteroid_list.erase(iter);

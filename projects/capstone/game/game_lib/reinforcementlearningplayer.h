@@ -6,13 +6,15 @@
 #include "action.h"
 #include "player.hpp"
 #include "state.h"
+#include "states.h"
 
 class ReinforcementLearningPlayer : public CPlayer
 {
 public:
     ReinforcementLearningPlayer(bool learning, double alpha,
                                 double gamma, double epsilon,
-                                size_t environment_number);
+                                size_t environment_number,
+                                States& states);
     virtual ~ReinforcementLearningPlayer() override = default;
 
     void computeState(const std::list<CAsteroid> & asteroid_list,
@@ -41,7 +43,9 @@ private:
     std::list<ActionPtr> getBestActions(const StatePtr &state) const;
 
     StatePtr current_state;
-    ActionPtr current_action;    
+    ActionPtr current_action;
+
+    States& states;
 };
 
 #endif // REINFORCEMENTLEARNINGPLAYER_H

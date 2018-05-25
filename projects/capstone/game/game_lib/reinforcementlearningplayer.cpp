@@ -10,7 +10,8 @@ ReinforcementLearningPlayer::ReinforcementLearningPlayer(bool learning,
                                                          double alpha,
                                                          double gamma,
                                                          double epsilon,
-                                                         size_t environment_number)
+                                                         size_t environment_number,
+                                                         States& states)
     : epsilon(epsilon)
     , alpha(alpha)
     , gamma(gamma)
@@ -18,6 +19,7 @@ ReinforcementLearningPlayer::ReinforcementLearningPlayer(bool learning,
     , environment_number(environment_number)
     , current_state(nullptr)
     , current_action(nullptr)
+    , states(states)
 {
 
 }
@@ -81,7 +83,7 @@ void ReinforcementLearningPlayer::learn(const double reward,
 void ReinforcementLearningPlayer::computeState(const std::list<CAsteroid> &asteroid_list,
                                                const std::list<CExplosion> &explosion_list)
 {
-    current_state = States::getState(asteroid_list,
+    current_state = states.getState(asteroid_list,
                  m_fXPos,
                  m_ShotList,
                                      explosion_list,

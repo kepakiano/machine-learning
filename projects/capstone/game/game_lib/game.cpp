@@ -18,7 +18,6 @@
 #include "fake_renderer.hpp"
 #include "utilities.hpp"
 
-#include "states.h"
 
 using namespace std;
 
@@ -69,11 +68,13 @@ void CGame::configureReinforcementLearning(const bool bot_is_learning,
                                            const double reward_space_station_hit_multiplier,
                                            const double reward_no_event,
                                            const double reward_ship_hit, const double reward_game_over,
-                                           const size_t environment_number)
+                                           const size_t environment_number,
+                                           States& states)
 {
   m_pPlayer = new ReinforcementLearningPlayer(bot_is_learning, alpha,
                                               gamma, epsilon,
-                                              environment_number);
+                                              environment_number,
+                                              states);
   reward_space_station_hit_multiplier_ = reward_space_station_hit_multiplier;
   reward_no_event_ = reward_no_event;
   reward_ship_hit_ = reward_ship_hit;
@@ -207,7 +208,7 @@ void CGame::SpawnAsteroids(){
 } // SpawnAsteroids
 
 double CGame::CheckCollisions(){
-  double reward = rewardNoEvent();
+  double reward = 0.0;
 
   list<CShot> &ShotList = m_pPlayer->GetShotList();
   list<CAsteroid>::iterator ItAsteroid = m_AsteroidList.begin();
@@ -261,6 +262,8 @@ double CGame::CheckCollisions(){
       ItAsteroid = m_AsteroidList.erase(ItAsteroid);
     }
   }
+  if(std::abs(reward) < 0.0001)
+    return rewardNoEvent();
   return reward;
 } // CheckCollisions
 

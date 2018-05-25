@@ -26,12 +26,13 @@ int main(int argc, char** argv){
   double epsilon = 1.0;
 
   bool bot_is_learning = false;
+  States states;
 
   std::vector<int> scores;
   int test_cases_id;
   if(argc == 2){
     test_cases_id = std::stoi(argv[1]);
-    Environment env = States::loadStates(test_cases_id);
+    Environment env = states.loadStates(test_cases_id);
     alpha = env.alpha;
     gamma = env.gamma;
     environment_number = env.environment_id;
@@ -44,7 +45,7 @@ int main(int argc, char** argv){
     Game.configureReinforcementLearning(bot_is_learning, alpha, gamma, epsilon,
                                         reward_space_station_hit_multiplier,
                                         reward_no_event, reward_ship_hit,
-                                        reward_game_over, environment_number);
+                                        reward_game_over, environment_number,states);
     Game.Init(false);
 
     Game.Run();

@@ -9,21 +9,23 @@
 #include "renderer.h"
 #include "timer.hpp"
 
+#include "states.h"
+
 class CGame{
 public:
   CGame(const int screen_width, const int screen_height);
 
   void Init(const bool use_sdl);
-  void configureReinforcementLearning(
-      const bool bot_is_learning,
-      const double alpha,
-      const double gamma,
-      const double epsilon,
-      const double reward_space_station_hit,
-      const double reward_no_event,
-      const double reward_ship_hit,
-      const double reward_game_over,
-      const size_t environment_number);
+  void configureReinforcementLearning(const bool bot_is_learning,
+                                      const double alpha,
+                                      const double gamma,
+                                      const double epsilon,
+                                      const double reward_space_station_hit,
+                                      const double reward_no_event,
+                                      const double reward_ship_hit,
+                                      const double reward_game_over,
+                                      const size_t environment_number,
+                                      States &states);
   void Run();
   void GameOver();
   void Quit();
