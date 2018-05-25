@@ -10,9 +10,9 @@ alpha = [0.5, 0.9]
 gamma = [0.5, 0.9]
 #environment_number = [1, 2, 3, 4, 5]
 
-training_runs = 1
+training_runs = 100000
 
-parameter_list = [reward_station_hit_multiplier, reward_no_event, reward_ship_hit, reward_game_over, epsilon_function, alpha, gamma, environment_number]
+parameter_list = [reward_station_hit_multiplier, reward_no_event, reward_ship_hit, reward_game_over, epsilon_function, alpha, gamma]
 
 def total_size():
     size = 1
@@ -31,5 +31,4 @@ for i in range(total_size()):
 
     print parameters
 
-    os.system('./ReinforcementLearningTraining -r ' + str(training_runs) + ' -s ' + str(reward_station_hit_multiplier[parameters[0]]) + ' -n ' +str(reward_no_event[parameters[1]]) + ' -h ' +str(reward_ship_hit[parameters[2]])+' -o ' + str(reward_game_over[parameters[3]]) + ' -p ' + str(epsilon_function[parameters[4]]) + ' -a ' +str(alpha[parameters[5]]) + ' -g ' +str(gamma[parameters[6]]) + ' -e ' + str(environment_number[parameters[7]]))
-    break
+    os.system('./ReinforcementLearningTraining -r ' + str(training_runs) + ' -s ' + str(reward_station_hit_multiplier[parameters[0]]) + ' -n ' +str(reward_no_event[parameters[1]]) + ' -h ' +str(reward_ship_hit[parameters[2]])+' -o ' + str(reward_game_over[parameters[3]]) + ' -p ' + str(epsilon_function[parameters[4]]) + ' -a ' +str(alpha[parameters[5]]) + ' -g ' +str(gamma[parameters[6]]) + ' -e ' + "1")
