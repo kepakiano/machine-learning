@@ -1,5 +1,6 @@
 #include <numeric>
 #include <iostream>
+#include <omp.h>
 
 #include <boost/program_options.hpp>
 #include <iomanip>
@@ -139,11 +140,14 @@ int main(int argc, char** argv){
     return EXIT_FAILURE;
   }
 
-  for(environment_number = 1; environment_number < 2; ++environment_number){
+
+  omp_set_num_threads(4);
+
+#pragma omp parallel for
+  for(environment_number = 1; environment_number < 5; ++environment_number){
     States states;
 
-
-
+#pragma omp critical
     DatabaseConnection::createTables();
     CGame Game(800, 600);
 
@@ -151,11 +155,14 @@ int main(int argc, char** argv){
 
     bool bot_is_learning = true;
 
+#pragma omp critical
     DatabaseConnection::addRowEnvironment(reward_space_station_hit_multiplier,
                                           reward_no_event, reward_ship_hit,
                                           reward_game_over, environment_number);
 
-    const int environment_id = DatabaseConnection::getIdEnvironment(reward_space_station_hit_multiplier,
+    int environment_id;
+#pragma omp critical
+    environment_id = DatabaseConnection::getIdEnvironment(reward_space_station_hit_multiplier,
                                                                     reward_no_event, reward_ship_hit, reward_game_over,
                                                                     environment_number);
     std::cout << std::fixed;
@@ -176,8 +183,12 @@ int main(int argc, char** argv){
       epsilon = calculateEpsilon(epsilon_function, epsilon, i, training_runs);
     }
 
+#pragma omp critical
     DatabaseConnection::addRowTestCases(environment_id, alpha, gamma, epsilon_function, 0.0, 0.0, 0.0, 0.0, 0.0);
-    const int test_cases_id = DatabaseConnection::getIdTestCases(environment_id, alpha, gamma, epsilon_function);
+
+    int test_cases_id;
+#pragma omp critical
+    test_cases_id = DatabaseConnection::getIdTestCases(environment_id, alpha, gamma, epsilon_function);
 
 
     //  auto saved_state = States::hashedStates();
@@ -194,6 +205,7 @@ int main(int argc, char** argv){
     //  }
 
 
+#pragma omp critical
     states.saveStates(test_cases_id);
   }
   return EXIT_SUCCESS;

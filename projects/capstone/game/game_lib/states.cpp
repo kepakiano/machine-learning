@@ -284,14 +284,13 @@ size_t States::hashState1(const StatePtr &state)
   statePossibleActions(state, hash);
   stateWeaponsArray(state, hash);
   stateNextAsteroidThatDoesNotGetHit(state, hash);
-//  stateAsteroidsGoingToHitTheShip(state, hash);
   return hash;
 }
 
 size_t States::hashState2(const StatePtr &state)
 {
   StateHash hash = hashState1(state);
-  statePlayerLives(state, hash);
+  stateAsteroidsGoingToHitTheShip(state, hash);
   return hash;
 
 }
@@ -356,7 +355,6 @@ StatePtr States::getState(const std::list<CAsteroid> &asteroid_list,
 
   if(hashed_states_.find(hash) == hashed_states_.end()){
     hashed_states_[hash] = possibly_new_state;
-    std::cout << "New state: " << hash << std::endl;
   }
   else {
     assert(possibly_new_state->actions().size() == hashed_states_[hash]->actions().size());
