@@ -23,27 +23,28 @@ public:
         // vergangene Zeit seit dem letzten Frame
         m_fCurTime = std::chrono::high_resolution_clock::now();
         m_fElapsed = m_fCurTime - m_fLastTime;
+        std::cout << m_fElapsed.count() << std::endl;
         m_fLastTime = m_fCurTime;
     }
 
-    double GetElapsed(){
-      return 0.016666666;
-        return m_fElapsed.count();
+    virtual double GetElapsed() override{
+      return SECONDS_PER_FRAME;
+//        return m_fElapsed.count();
     }
 
-    std::chrono::high_resolution_clock::time_point GetCurTime(){
+    virtual std::chrono::high_resolution_clock::time_point GetCurTime() override{
         return m_fCurTime;
     }
 
-    std::chrono::high_resolution_clock::time_point GetStartTime(){
+    virtual std::chrono::high_resolution_clock::time_point GetStartTime() override {
         return start;
     }
 
-    void startFrame(){
+    virtual void startFrame() override {
         start_of_frame = std::chrono::high_resolution_clock::now();
     }
 
-    void sleepForRestOfFrame(const std::chrono::high_resolution_clock::time_point &start_of_frame){
+    virtual void sleepForRestOfFrame(const std::chrono::high_resolution_clock::time_point &start_of_frame) override{
         auto end_of_frame = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double, std::micro> duration_of_frame = end_of_frame - start_of_frame;
         std::this_thread::sleep_for(target_frame_duration-duration_of_frame);

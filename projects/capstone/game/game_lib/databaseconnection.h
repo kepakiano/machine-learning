@@ -52,6 +52,8 @@ public:
 
     static Environment loadStates(std::unordered_map<StateHash, StatePtr>& states,
                           const size_t test_cases_id);
+
+    static std::vector<int> getAllTestCaseIds();
 private:
     static const std::string database_file;
 

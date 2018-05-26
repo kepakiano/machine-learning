@@ -4,6 +4,9 @@
 #include <chrono>
 
 class CTimer {
+
+protected:
+  const double SECONDS_PER_FRAME = 0.0166666;
 public:
     virtual void Update() = 0;
 

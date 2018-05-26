@@ -10,24 +10,16 @@ int main(int argc, char *argv[]){
   CGame Game(screen_width, screen_height);
   
   bool reinforcement_learning = false;
-  bool use_sdl_renderer = true;
-  bool bot_is_learning = true;
+  const bool use_sdl_renderer = true;
+  const bool bot_is_learning = false;
   double alpha, gamma;
   size_t training_runs = 1;
   size_t test_runs =0;
-  double epsilon = 1.0;
+  double epsilon = 0.0;
   size_t test_cases_id;
   size_t environment_number;
   States states;
-  if(argc == 4){
-    training_runs = std::stoi(argv[1]);
-    alpha = std::stod(argv[2]);
-    gamma = std::stod(argv[3]);
-    reinforcement_learning = true;
-    use_sdl_renderer = false;
-    training_runs = 100;
-    test_runs = 3;
-  }
+
   if(argc == 2){
     test_cases_id = std::stoi(argv[1]);
     Environment env = states.loadStates(test_cases_id);
@@ -35,14 +27,9 @@ int main(int argc, char *argv[]){
     gamma = env.gamma;
     environment_number = env.environment_id;
     reinforcement_learning = true;
-    bot_is_learning = false;
-    std::cout << "Loaded environment with: alpha = " << alpha << ", gamma = " << gamma << ", environment_id = " << environment_number << std::endl;
+    std::cout << "Loaded environment with: alpha = " << alpha << ", gamma = " << gamma << ", environment_id = " << environment_number << ", test_cases_id = " << test_cases_id << std::endl;
   }
   for(size_t i = 0; i < training_runs+test_runs; ++i){
-    if(i == training_runs && reinforcement_learning){
-      bot_is_learning = false;
-      use_sdl_renderer = true;
-    }
     if(reinforcement_learning){
 
       Game.configureReinforcementLearning(bot_is_learning, alpha, gamma, epsilon,
@@ -53,8 +40,7 @@ int main(int argc, char *argv[]){
 
     }
     std::cout << "epsilon: " << epsilon << " ";
-    Game.Init(use_sdl_renderer/*, reinforcement_learning, bot_is_learning, alpha, gamma, epsilon*/);
-    epsilon *= 0.999;
+    Game.Init(true);
 
     Game.Run();
     Game.GameOver();

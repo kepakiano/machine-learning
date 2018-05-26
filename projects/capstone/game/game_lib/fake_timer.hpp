@@ -11,7 +11,7 @@ public:
     virtual void Update() override {}
 
     // Always return 1/60. seconds, which will result in a fake framerate of 60FPS
-    virtual double GetElapsed() override {return 0.0166666;}
+    virtual double GetElapsed() override {return SECONDS_PER_FRAME;}
 
     virtual std::chrono::high_resolution_clock::time_point GetCurTime() override {
         return std::chrono::high_resolution_clock::now();

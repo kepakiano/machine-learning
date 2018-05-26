@@ -219,7 +219,7 @@ Environment DatabaseConnection::loadStates(std::unordered_map<StateHash, StatePt
   SQLite::Statement query_get_state(db, "SELECT * FROM " + STATES + " WHERE  test_cases_id_fk = ?");
   query_get_state.bind(1, std::to_string(test_cases_id));
 
-  std::cout << "This should be 0: " << states.size() << " states" << std::endl;
+//  std::cout << "This should be 0: " << states.size() << " states" << std::endl;
   while(query_get_state.executeStep()){
     int states_id = query_get_state.getColumn(0);
     int hash = query_get_state.getColumn(2);
@@ -239,7 +239,7 @@ Environment DatabaseConnection::loadStates(std::unordered_map<StateHash, StatePt
     states.insert(std::make_pair(hash, state));
   }
 
-  std::cout << "Loaded " << states.size() << " states" << std::endl;
+//  std::cout << "Loaded " << states.size() << " states" << std::endl;
 
   SQLite::Statement query_get_test_cases(db, "SELECT * FROM " + TEST_CASES + " WHERE test_cases_id = ?");
   query_get_test_cases.bind(1, std::to_string(test_cases_id));
@@ -256,6 +256,21 @@ Environment DatabaseConnection::loadStates(std::unordered_map<StateHash, StatePt
   int environment_id = std::stod(query_get_env.getColumn(5));
 
   return Environment(environment_id, alpha, gamma);
+}
+
+std::vector<int> DatabaseConnection::getAllTestCaseIds()
+{
+
+  SQLite::Database db(database_file, SQLite::OPEN_READONLY);
+  SQLite::Statement query_get_test_cases(db, "SELECT test_cases_id FROM " + TEST_CASES);
+
+  std::vector<int> test_cases_ids;
+  while(query_get_test_cases.executeStep()){
+    int test_cases_id = std::stoi(query_get_test_cases.getColumn(0));
+    test_cases_ids.push_back(test_cases_id);
+  }
+
+  return test_cases_ids;
 }
 
 void DatabaseConnection::insert(const std::string &table,

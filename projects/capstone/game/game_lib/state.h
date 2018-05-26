@@ -35,7 +35,7 @@ public:
 
   StateHash hash() const {return hash_;}
   void setHash(StateHash hash) {hash_ = hash;}
-  std::list<ActionPtr> actions() const {return actions_;}
+  const std::list<ActionPtr> & actions() const {return actions_;}
   ActionPtr action(ActionChoice choice) {return actions_map_.at(choice);}
 
   const std::list<CAsteroid> &asteroid_list() const {return asteroid_list_;}

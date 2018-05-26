@@ -378,6 +378,19 @@ void States::saveStates(const int test_cases_id)
 void States::printStatistics()
 {
   std::cout << "Total states: " << hashed_states_.size() << std::endl;
-  for(const auto& state_pair : hashed_states_)
-    std::cout << state_pair.second->hash() << " " << state_pair.second->visited() << std::endl;
+  size_t num_actions = 0;
+  double sum_reward = 0.0;
+  for(const auto& p : hashedStates()){
+    sum_reward += std::accumulate(p.second->actions().begin(),
+                                   p.second->actions().end(),
+                                   0.0,
+                                   [](double s, const auto& action_ptr){
+      return s + action_ptr->reward();
+    });
+    num_actions += p.second->actions().size();
+  }
+  std::cout << "Total actions: " << num_actions << std::endl;
+  std::cout << "Total reward: " << sum_reward << std::endl;
+//  for(const auto& state_pair : hashed_states_)
+//    std::cout << state_pair.second->hash() << " " << state_pair.second->visited() << std::endl;
 }

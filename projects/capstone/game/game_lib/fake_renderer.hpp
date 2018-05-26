@@ -13,7 +13,7 @@ class FakeRenderer : public Renderer{
                           const int lives_left,
                           const int score,
                           const int old_highscore) override {
-        std::cout << "The player reached a score of " << score << std::endl;
+//        std::cout << "The player reached a score of " << score << std::endl;
     }
     virtual void Quit() override {}
 
