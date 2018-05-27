@@ -1,4 +1,5 @@
 #include <numeric>
+#include <iomanip>
 #include <iostream>
 
 #include <boost/program_options.hpp>
@@ -36,7 +37,9 @@ int main(int argc, char** argv){
     test_cases_ids = DatabaseConnection::getAllTestCaseIds();
   }
 
+  double percent = 0.0;
   for(const auto test_cases_id : test_cases_ids){
+    percent += 1.0/test_cases_ids.size();
     std::vector<int> scores;
 
     Environment env = states.loadStates(test_cases_id);
@@ -78,7 +81,8 @@ int main(int argc, char** argv){
     double score_std = stdev;
 
     DatabaseConnection::addScore(test_cases_id, score_min, score_max, score_avg, score_std);
-    std::cout << test_cases_id << ": " <<  score_avg << " " << score_min << " " << score_max << std::endl;
+    std::cout << std::fixed;
+    std::cout << std::setprecision(2) << percent << " | " << test_cases_id << ": " <<  score_avg << " " << score_min << " " << score_max << std::endl;
 //    states.printStatistics();
   }
 

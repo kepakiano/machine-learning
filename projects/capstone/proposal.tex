@@ -39,7 +39,8 @@ I now want to build upon this and move from a discrete problem to a continuous o
 % In this section, clearly describe the problem that is to be solved. The problem described should be well defined and should have at least one relevant potential solution. Additionally, describe the problem thoroughly such that it is clear that the problem is quantifiable (the problem can be expressed in mathematical or logical terms) , measurable (the problem can be measured by some metric and clearly observed), and replicable (the problem can be reproduced and occurs more than once).
 As an exercise to learn C++ and take a first peak into game programming, I programmed a 2d space game at the beginning of my studies in 2010, see figure \ref{fig:game}.
 The goal of the game is to reach a score as high as possible by surviving and shooting down asteroids.
-These asteroids spawn at random positions on the top of the screen and can either hit the player's ship making him lose a life or hit the off-screen space station which the player is supposed to protect. The space station gets repaired over time, but the player will lose if its health drops below $0$.
+These asteroids spawn at random positions on the top of the screen and can either hit the player's ship making him lose a life or hit the off-screen space station which the player is supposed to protect.
+The space station gets repaired over time, but the player will lose if its health drops below $0$.
 It might therefore be wise to crash the ship into an asteroid if it cannot be stopped otherwise and the space station is at low health.
 In other situations it could be beneficial to let the asteroids hit the space station, since its health bar is still full.
 Additionally, the amount of shots the player can fire at a time is limited, so it's not feasable to just fire at will.

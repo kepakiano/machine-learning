@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[hyphens]{url}
 \usepackage{graphicx}
+\usepackage{nameref}
 %opening
 \title{Machine Learning Engineer Nanodegree\\Final Report}
 \author{Sebastian Schmitz}
@@ -32,7 +33,7 @@ In order to be able to showcase this, another goal of this project was to seemle
 
 \begin{figure}
  \centering
- \includegraphics[width=\linewidth]{game2.png}
+ \includegraphics[width=\linewidth]{game3.png}
  \label{fig:game}
  \caption{2d space game}
 \end{figure}
@@ -59,7 +60,7 @@ It could either use the actual data the game logic works with or the visual repr
 However, since this project is not supposed to compete with a Google project - neither regarding manpower nor computational ressources - the decision was made to use the data that is already there:
 
 \begin{itemize}
- \item Lifes left: Every time the space ship gets hit by an asteroid, the player will lose a life and eventually the entire game if no lives are left. The player starts with six lives.
+ \item Lives left: Every time the space ship gets hit by an asteroid, the player will lose a life and eventually the entire game if no lives are left. The player starts with six lives.
  \item Space station health: Every time an asteroid is allowed to cross the screen, the space station will lose 16 health points and regenerate it at a fixed rate of five points per second until it is back at 100 again. If the space station health drops below $0$, the player will lose the game.
  \item Asteroids: Set of x- and y-coordinates describing the positions of the asteroids
  \item Ship position: The ship can move left and right on the lower edge of the screen
@@ -76,9 +77,16 @@ However, we do not just want to find \emph{any} such policy, we want to find one
 Therefore, we define a value function $V$ so that
 \[V_\pi(s) = E[R] = E[\sum_{t=0}^\infty\gamma^tr_t|s_0=s]\].
 $R$ is the expected return following policy $\pi$ starting in state $s$.
-Two more things are needed to fully grasp this formula: The reward $r_t$ and the discount factor $\gamma$:
+Two more things are needed to fully grasp this formula: The reward $r_t$ and the discount factor $\gamma$.
+The former is the direct return for an action given by the environment and can be positive or negative.
+The later is a value between $0$ and $1$ and determines how strongly future rewards are taken into account.
 
+The task to solve in this setting is to find a policy $\pi$ which maximizes $V^\pi(s)$:
+\[V^*(s) = \max_\pi V^\pi(s)\]
+Since we cannot know the number of policies it is computationally unfeasable to directly calculate the optimal policy.
 
+Hence, an algorithm is needed that can approximate the optimal policy in an iterative fashion.
+It will start with an initial guess at the optimal policy and slowly improve its performance until it converges.
 
 % In this section, you will want to clearly define the problem that you are trying to solve, including the strategy (outline of tasks) you will use to achieve the desired solution.
 % You should also thoroughly discuss what the intended solution will be for this problem. Questions to ask yourself when writing this section:
@@ -89,35 +97,102 @@ Two more things are needed to fully grasp this formula: The reward $r_t$ and the
 
 % It might therefore be wise to crash the ship into an asteroid if it cannot be stopped otherwise and the space station is at low health.
 % In other situations it could be beneficial to let the asteroids hit the space station, since its health bar is still full.
-% Additionally, the amount of shots the player can fire at a time is limited, so it's not feasable to just fire at will.
 
 % The task of this project is therefore to let a machine learning algorithm figure out how to achieve the highest score.
 % In order not to bias the learning agent, no human-devised strategies will be programmed into the approach.
 % This will lead to an algorithm that potentially uses methods a human would not have thought of and that can cope with any of the random situations, the game throws at it.
 
 \subsection{Metrics}
-% In this section, you will need to clearly define the metrics or calculations you will use to measure performance of a model or result in your project. These calculations and metrics should be justified based on the characteristics of the problem and problem domain. Questions to ask yourself when writing this section:
+% In this section, you will need to clearly define the metrics or calculations you will use to measure performance of a model or result in your project. 
+%These calculations and metrics should be justified based on the characteristics of the problem and problem domain. Questions to ask yourself when writing this section:
 
 % Are the metrics you’ve chosen to measure the performance of your models clearly discussed and defined?
 % Have you provided reasonable justification for the metrics chosen based on the problem and solution?
+In contrast to supervised learning problems where you can easily measure the performance using precision, recall or F-scores, it is hard to define a metric to evaluate the proposed algorithm.
+
+Since the task of the agent is to maximize the score, it makes sense to compare its performance to other players:
+Human players will be asked to play the game to the best of their ability.
+Furthermore, a random agent will play the game in order to find a bottom line for the score count.
+The proposed system will be compared to these players and is expected to perform much better than the random player and hopefully as good as humans or even better.
 \section{Analysis}
 % (approx. 2-4 pages)
 
 \subsection{Data Exploration}
-% In this section, you will be expected to analyze the data you are using for the problem. This data can either be in the form of a dataset (or datasets), input data (or input files), or even an environment. The type of data should be thoroughly described and, if possible, have basic statistics and information presented (such as discussion of input features or defining characteristics about the input or environment). Any abnormalities or interesting qualities about the data that may need to be addressed have been identified (such as features that need to be transformed or the possibility of outliers). Questions to ask yourself when writing this section:
+% In this section, you will be expected to analyze the data you are using for the problem. This data can either be in the form of a dataset (or datasets), input data (or input files), or even an environment.
+%The type of data should be thoroughly described and, if possible, have basic statistics and information presented (such as discussion of input features or defining characteristics about the input or environment). 
+%Any abnormalities or interesting qualities about the data that may need to be addressed have been identified (such as features that need to be transformed or the possibility of outliers). Questions to ask yourself when writing this section:
 
 % If a dataset is present for this problem, have you thoroughly discussed certain features about the dataset? Has a data sample been provided to the reader?
 % If a dataset is present for this problem, are statistics about the dataset calculated and reported? Have any relevant results from this calculation been discussed?
 % If a dataset is not present for this problem, has discussion been made about the input space or input data for your problem?
 % Are there any abnormalities or characteristics about the input space or dataset that need to be addressed? (categorical variables, missing values, outliers, etc.)
+As described in the problem statement, there is no datasat to analyze.
+Rather, the game consists of several elements relevant to the game logic that make up the state space.
+In detail, these are:
+
+\begin{itemize}
+ \item Player lives: As described above, this is an integer ranging from $6$ to $0$.
+ \item Space station health: As described above, this is an integer ranging from $100$ to $0$.
+ \item Asteroids: The asteroids spawn at eight equidistant points off the top edge of the screen. The spawnpoint is chosen at random. In every subsequent frame they travel with a speed of 200 pixels per second towards the lower edge of the screen. Thus, in each frame there is a set of (x,y) coordinates describing where the asteroids are. Each asteroid is 64 pixels wide and 64 pixels high.
+ \item Ship position: The player can be at any point on the lower corner of the screen as long as he does not crash into the border of the screen.
+ \item Weapons array cooldown: A floating point number keeping track of how long ago the last shot was fired. The player can only fire if the last shot was more than half a second ago.
+ \item Shot position: When the player shoots, a shot spawns at the ship's position and travels up in a vertical line with a speed of $400$ pixels per second until it hits an asteroid or eventually goes off screen and gets deleted.
+\end{itemize}
+Furthermore, there are details to the game logic that are not directly observable and that don't change over time:
+\begin{itemize}
+ \item The speeds the player and the asteroids travel at which is 300 and 200 pixels per second respectively.
+ \item The amount of health the space station loses when getting hit by an asteroid, here: 16 health points per hit.
+ \item The rate at which the space station gets repaired, here: One health point every $0.35$.
+ \item The rate at which the asteroids spawn, here: One every $0.75$ seconds.
+ \item The size of the screen is 800 by 600 pixels.
+\end{itemize}
+
+Since this second set of information is not directly conveyed to the human player either, it is not supposed to enter into the state space.
+We will therefore focus on how the first set of information forms the state space and make a guess at how large it is to estimate the difficulty of the task at hand.
+
+The combination of the player's lives and space station health brings the state space to a size of $7 \cdot 101 = 707$.
+
+The combinations of asteroids are a little harder to calculate: They spawn every $0.75$ seconds and need $\frac{600}{200} = 3$ seconds to travel to the bottom of the screen.
+Since they spawn a little above the screen - at a y-position of $-60$ -  and crash into the space station at y-position $590$, there can be at maximum five asteroids at once.
+% If we limit the coordinates to integers, the position of one asteroid can take one of $600 \dot 8 = 4800$ values.
+Since there is a $0.75$ pause between asteroids, the cardinality is not just the amount of different positions an asteroid can be in to the power of five.
+If there are five asteroids, the one that spawned earliest is at least at y-position $540$: It spawned at $-60$, then three seconds passed making it travel to $540$ and making four more asteroids spawned during that time.
+The first asteroid can be in $(590-540)\cdot8 = 400$ positions.
+The y-positions of every subsequent asteroid is irrelevant since it is directly dependent on the first asteroids y-positions.
+Therefore, only their x-positions matter.
+This brings the state space spanned by the asteroids to $400\cdot8\cdot8\cdot8\cdot8 = 1,638,400$ different combinations.
+
+The ships position ranges from $0$ to $752$\footnote{This is a programming error. It should only be able to fly to an x-position of $736$, because it is $64$ pixels wide. However, in a previous version of the game, the sprite for the ship was $48$ by $48$ pixels and the maximum x-position was never changed after.}.
+
+The weapons array cooldown is a floating point number that can in theory take any positive value.
+However, if we assume that the player fires a shot at the latest one second after the last shot was fired - so half a second after he is already eligible to fire another shot - we can limit the combinations to $60$, because there are $60$ frames in a second.
+
+A shot can - in principal - be in any position of the screen, as long as it does not overlap with an asteroid.
+Since a shot travel $400$ pixels per second and two shots can be taken per second, there can be three shots at the same time.
+Each can roughly be at $200 \cdot 600 = 120000$ positions, bringing the combinations in total to a staggering number of $1728000000000000$.
+
+This leads to a total size of the state space of $7\cdot101\cdot1638400\cdot753\cdot60\cdot(600\cdot200)^3 = 90,433,495,498,752,000,000,000,000,000L = 90E27$.
+
+Obiviously, this is much too big to be handled in a project of this scope, making it crucial to find a way to reduce the size of the state space without losing too much information or biasing the algorithm.
+How this is achieved will be explained in \nameref{datapreprocessing}.
+
+
 \subsection{Exploratory Visualization}
-% In this section, you will need to provide some form of visualization that summarizes or extracts a relevant characteristic or feature about the data. The visualization should adequately support the data being used. Discuss why this visualization was chosen and how it is relevant. Questions to ask yourself when writing this section:
+% In this section, you will need to provide some form of visualization that summarizes or extracts a relevant characteristic or feature about the data. 
+%The visualization should adequately support the data being used. Discuss why this visualization was chosen and how it is relevant. Questions to ask yourself when writing this section:
 
 % Have you visualized a relevant characteristic or feature about the dataset or input data?
 % Is the visualization thoroughly analyzed and discussed?
 % If a plot is provided, are the axes, title, and datum clearly defined?
+Since this project is about a game, every frame of the game is a visualization of the data we are to examine.
+Therefore, the example screenshot \ref{fig:game} will be analyzed.
+We can see that there are three asteroids which spawned in the middle region of the screen.
+The vertical distance between them is the same since they spawned at a fixed interval.
+One asteroid was shot down recently: The explosion caused by that is still visible and it yielded a score of 218.
+The player and the space station are both still at full health and the player has reached a score of 1353 points so far.
 \subsection{Algorithms and Techniques}
-% In this section, you will need to discuss the algorithms and techniques you intend to use for solving the problem. You should justify the use of each one based on the characteristics of the problem and the problem domain. Questions to ask yourself when writing this section:
+% In this section, you will need to discuss the algorithms and techniques you intend to use for solving the problem. 
+% You should justify the use of each one based on the characteristics of the problem and the problem domain. Questions to ask yourself when writing this section:
 
 % Are the algorithms you will use, including any default variables/parameters in the project clearly defined?
 % Are the techniques to be used thoroughly discussed and justified?
@@ -131,6 +206,7 @@ Two more things are needed to fully grasp this formula: The reward $r_t$ and the
 % (approx. 3-5 pages)
 
 \subsection{Data Preprocessing}
+\label{datapreprocessing}
 % In this section, all of your preprocessing steps will need to be clearly documented, if any were necessary. From the previous section, any of the abnormalities or characteristics that you identified about the dataset will be addressed and corrected here. Questions to ask yourself when writing this section:
 
 % If the algorithms chosen require preprocessing steps like feature selection or feature transformations, have they been properly documented?
