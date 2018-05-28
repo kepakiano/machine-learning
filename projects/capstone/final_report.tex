@@ -108,16 +108,15 @@ It will start with an initial guess at the optimal policy and slowly improve its
 
 % Are the metrics you’ve chosen to measure the performance of your models clearly discussed and defined?
 % Have you provided reasonable justification for the metrics chosen based on the problem and solution?
-In contrast to supervised learning problems where you can easily measure the performance using precision, recall or F-scores, it is hard to define a metric to evaluate the proposed algorithm.
-
-Since the task of the agent is to maximize the score, it makes sense to compare its performance to other players:
-Human players will be asked to play the game to the best of their ability.
-Furthermore, a random agent will play the game in order to find a bottom line for the score count.
-The proposed system will be compared to these players and is expected to perform much better than the random player and hopefully as good as humans or even better.
+In contrast to supervised learning problems where you can easily measure the performance using precision, recall or F-scores, the performance of the proposed algorithm is only measurable using feature offered by the application domain.
+Since the task of the algorithm is to maximize the score, that is the measurement we are going to use.
+The algorithm will first train by playing the game until it has explored the state space sufficiently and has exploited the gained knowledge to optimize the policy.
+To make the analysis of the performance statistically sounder, the algorithm will then be tested $100$ times and we will take note of the minimum and maximum score as well as the mean and standard deviation.
 \section{Analysis}
 % (approx. 2-4 pages)
 
 \subsection{Data Exploration}
+\label{dataexploration}
 % In this section, you will be expected to analyze the data you are using for the problem. This data can either be in the form of a dataset (or datasets), input data (or input files), or even an environment.
 %The type of data should be thoroughly described and, if possible, have basic statistics and information presented (such as discussion of input features or defining characteristics about the input or environment). 
 %Any abnormalities or interesting qualities about the data that may need to be addressed have been identified (such as features that need to be transformed or the possibility of outliers). Questions to ask yourself when writing this section:
@@ -174,7 +173,7 @@ Each can roughly be at $200 \cdot 600 = 120000$ positions, bringing the combinat
 This leads to a total size of the state space of $7\cdot101\cdot1638400\cdot753\cdot60\cdot(600\cdot200)^3 = 90,433,495,498,752,000,000,000,000,000L = 90E27$.
 
 Obiviously, this is much too big to be handled in a project of this scope, making it crucial to find a way to reduce the size of the state space without losing too much information or biasing the algorithm.
-How this is achieved will be explained in \nameref{datapreprocessing}.
+How this is achieved will be explained in the chapter \nameref{datapreprocessing}.
 
 
 \subsection{Exploratory Visualization}
@@ -197,21 +196,55 @@ The player and the space station are both still at full health and the player ha
 % Are the algorithms you will use, including any default variables/parameters in the project clearly defined?
 % Are the techniques to be used thoroughly discussed and justified?
 % Is it made clear how the input data or datasets will be handled by the algorithms and techniques chosen?
+
+
 \subsection{Benchmark}
-% In this section, you will need to provide a clearly defined benchmark result or threshold for comparing across performances obtained by your solution. The reasoning behind the benchmark (in the case where it is not an established result) should be discussed. Questions to ask yourself when writing this section:
+% In this section, you will need to provide a clearly defined benchmark result or threshold for comparing across performances obtained by your solution.
+% The reasoning behind the benchmark (in the case where it is not an established result) should be discussed. Questions to ask yourself when writing this section:
 
 % Has some result or value been provided that acts as a benchmark for measuring performance?
 % Is it clear how this result or value was obtained (whether by data or by hypothesis)?
+
+Since the task of the agent is to maximize the score and there is no ground truth to what it can and should achieve, we can only compare it to the performance of other players:
+Human players will be asked to play the game to the best of their ability.
+We will take note of the statistical properties of the scores they achieve the same way we do for the trained player.
+However, in order to save time, human players will not be asked to play $100$ times: $5$ runs will have to suffice.
+Furthermore, a random agent will play the game in order to find a bottom line for the score count.
+The proposed system will be compared to these players and is expected to perform much better than the random player and hopefully as good as humans or even better.
 \section{Methodology}
 % (approx. 3-5 pages)
 
 \subsection{Data Preprocessing}
 \label{datapreprocessing}
-% In this section, all of your preprocessing steps will need to be clearly documented, if any were necessary. From the previous section, any of the abnormalities or characteristics that you identified about the dataset will be addressed and corrected here. Questions to ask yourself when writing this section:
+% In this section, all of your preprocessing steps will need to be clearly documented, if any were necessary. 
+% From the previous section, any of the abnormalities or characteristics that you identified about the dataset will be addressed and corrected here. Questions to ask yourself when writing this section:
 
 % If the algorithms chosen require preprocessing steps like feature selection or feature transformations, have they been properly documented?
 % Based on the Data Exploration section, if there were abnormalities or characteristics that needed to be addressed, have they been properly corrected?
 % If no preprocessing is needed, has it been made clear why?
+As discussed in the chapter \nameref{dataexploration} the state space of the game is too large to let a computer agent draw knowledge from it.
+The need for computational power and storage would both exceed the scope of this project by far.
+Furthermore, the true state space is probably a subspace of what was explained above with much fewer dimensions.
+\emph{True state space} here means the space that needs to be explored in order to achieve a reasonable performance. 
+The distinction between many states in the original state space does not yield any knowledge that can be exploited.
+Here are a few examples to highlight this:
+\begin{itemize}
+ \item If a shot is going to travel off screen without a chance of hitting another asteroid because it will leave the game before the asteroid can spawn, the position of that shot does not matter at all.
+ \item If an asteroid is too far away from the ship in the x-axis and will hit the space station regardless of what the player does, the position of that asteroid also does not matter.
+\end{itemize}
+These were examples for information that makes not difference at all.
+There is more information that can probably be summarized: We will lose a bit of information, but the increase in performance due to the reduction of the problem's dimensionality might compensate for that:
+\begin{itemize}
+ \item The exact number of the space station's health points will be quantized into four categories: $0$ HP, $1$ to $33$ HP, $34$ to$ 67$ HP and more than $68$ HP
+ \item The asteroids positions will be boiled down to one piece of information: Where is the asteroid will not get hit by a shot so far and that is still reachable for the player? 
+ This is stored in using two bits: It might be to the left, to the right, in front of the ship or non-existent.
+ \item The possibly $60$ state of the weapons array will be expressed in one bit: Is it possible to shoot or not?
+ \item The player's position will take two bits: Can the ship move left, right or both?
+\end{itemize}
+
+
+
+
 \subsection{Implementation}
 % In this section, the process for which metrics, algorithms, and techniques that you implemented for the given data will need to be clearly documented. It should be abundantly clear how the implementation was carried out, and discussion should be made regarding any complications that occurred during this process. Questions to ask yourself when writing this section:
 
