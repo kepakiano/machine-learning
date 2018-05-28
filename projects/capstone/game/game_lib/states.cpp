@@ -281,16 +281,16 @@ StatePtr States::buildState(
 size_t States::hashState1(const StatePtr &state)
 {
   StateHash hash = 1;
-  statePossibleActions(state, hash);
+  statePossibleActions(state, hash); // 6
   stateWeaponsArray(state, hash);
-  stateNextAsteroidThatDoesNotGetHit(state, hash);
+  stateNextAsteroidThatDoesNotGetHit(state, hash); // 4
   return hash;
 }
 
 size_t States::hashState2(const StatePtr &state)
 {
   StateHash hash = hashState1(state);
-  stateAsteroidsGoingToHitTheShip(state, hash);
+  stateAsteroidsGoingToHitTheShip(state, hash); // ?
   return hash;
 
 }
@@ -298,14 +298,14 @@ size_t States::hashState2(const StatePtr &state)
 size_t States::hashState3(const StatePtr &state)
 {
   StateHash hash = hashState2(state);
-  statePlayerLives(state, hash);
+  statePlayerLives(state, hash); // 2
   return hash;
 }
 
 size_t States::hashState4(const StatePtr &state)
 {
   size_t hash = hashState3(state);
-  stateSpaceStationHealth(state, hash);
+  stateSpaceStationHealth(state, hash); //4
 
   return hash;
 }
