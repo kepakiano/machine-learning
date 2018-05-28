@@ -190,6 +190,7 @@ The vertical distance between them is the same since they spawned at a fixed int
 One asteroid was shot down recently: The explosion caused by that is still visible and it yielded a score of 218.
 The player and the space station are both still at full health and the player has reached a score of 1353 points so far.
 \subsection{Algorithms and Techniques}
+\label{algorithms}
 % In this section, you will need to discuss the algorithms and techniques you intend to use for solving the problem. 
 % You should justify the use of each one based on the characteristics of the problem and the problem domain. Questions to ask yourself when writing this section:
 
@@ -271,7 +272,7 @@ There is more information that can probably be summarized: We will lose a bit of
 % 2*3*3*4*5
 
 This leaves us with a theoretical state space size of $4 \cdot 4 \cdot 8 \cdot 2 \cdot 3 \cdot 2 = 1536$.
-However, some combinations are not possible: The next asteroid cannot be left of the ship if the ship is at the left border.
+However, some combinations are not possible: For instance, the next asteroid cannot be left of the ship if the ship is at the left border of the screen.
 Also, since the distance between asteroids is 100 pixels, it is not possible to be in a state where moving left or right both would mean crashing into an asteroid.
 
 During evaluation the maximimum number of explored states was $360$, which is a reasonable number to handle and train on.
@@ -338,7 +339,7 @@ In order to incentivize exploration, a very slight punishment was added if no ot
 This way, when confronted with a new state, the agent chooses one of the actions at random, since they are all the best.
 If nothing happens, that action will be worth less than the other actions and the next time the agent enters this state, it will not be chosen.
 
-The final solution therefore is an agent that can sense the environment in up to $360$ different ways and that receives positives and negative rewards for nothing happening, getting hit by an asteroid, shoting down an asteroid, losing all of its lives, the space station getting hit, the space station getting destroyed and not being right in front of the most dangerous asteroid.
+The final solution therefore is an agent that can sense the environment in up to $360$ different ways and that receives positive and negative rewards for nothing happening, getting hit by an asteroid, shooting down an asteroid, losing all of its lives, the space station getting hit, the space station getting destroyed and not being right in front of the most dangerous asteroid.
 
 In the following chapter we will discuss how the different ways of sensing the environment and different rewards influence the players performance.
 \section{Results}
@@ -347,12 +348,60 @@ In the following chapter we will discuss how the different ways of sensing the e
 \subsection{Model Evaluation and Validation}
 % In this section, the final model and any supporting qualities should be evaluated in detail. 
 % It should be clear how the final model was derived and why this model was chosen.
-%In addition, some type of analysis should be used to validate the robustness of this model and its solution, such as manipulating the input data or environment to see how the model’s solution is affected (this is called sensitivity analysis). Questions to ask yourself when writing this section:
+%In addition, some type of analysis should be used to validate the robustness of this model and its solution, such as manipulating the input data or environment to see how the model’s solution is affected (this is called sensitivity analysis). 
+% Questions to ask yourself when writing this section:
 
 % Is the final model reasonable and aligning with solution expectations? Are the final parameters of the model appropriate?
 % Has the final model been tested with various inputs to evaluate whether the model generalizes well to unseen data?
 % Is the model robust enough for the problem? Do small perturbations (changes) in training data or the input space greatly affect the results?
 % Can results found from the model be trusted?
+
+The final model was chosen after the agent trained for a significant amount of time with a large variety of parameters: 
+Rewards, parameters inherent to reinforcement learning, and ways to sense the environment were all tested in different combinations.
+
+\paragraph{Rewards}
+As mentioned before, the player gets a reward between 0 and 600 for shooting down an asteroid and a negative reward for every pixel it is away from the asteroid closest to the lower edge as described above.
+These are fixed amounts and all the other rewards are relative to them.
+The tested rewards were:
+\begin{center}
+\begin{tabular}{lr}
+Getting hit by an asteroid: & $0$, $-100$ or $-1000$\\
+Space station getting hit: & $0$, $-80$ or $-160$\\
+No event: & $0$ or $-1$\\
+Game over: & $0$, $-500$, $-5000$\\
+\end{tabular}
+\end{center}
+
+\paragraph{Reinforcement Learning parameters}
+As described in Algorithms and Techniques the gamma value would decrease according to two different functions.
+Furthermore, the gamma and the alpha value were set to $0.5$ or $0.9$ in each run.
+
+\paragraph{State space quantization}
+In order to get a basic understanding of its surroundings the agent will sensed in every training run what actions it could take and where the most dangerous asteroid is.
+Three additional quanzization methods each including the knowledge of the preceding function were formulated:
+The second method tells the agent whether it will crash into an asteroid depending on the actions it can take.
+The third method informs it about its health and the last also includes the knowledge about the space station's health.
+
+\paragraph{}
+The different ways for the agent to perceive that game state, the rewards and the RL parameters allow for 1728 combinations.
+Every combination was tested and the results written into an SQLite database (\texttt{asteroids.db3}) which was uploaded to this repository.
+
+The best result was achieved by an agent that ignored the amount of lives it still had as well as the space station's health.
+$\alpha$ and $\gamma$ were both $0.5$, the reward for no event was $-1$, it got $-5000$ when losing, $-160$ when the space station was hit and $-100$ when getting hit itself.
+
+The agent was trained for $30000$, because for many combinations the score curve started to plateau after $22000$ games.
+
+After training and identification of the best function to describe the state space and the best set of rewards and parameters, the agent was deployed into a different environment:
+screen size and the amount of spawn points were changed as well as the speed at which the shipd travel.
+the first two variations did not hurt the performance of the agent much: it was still able to perform at an acceptable level and chose actions reasonably.
+However, when the speed of the ship was changed, suddenly the scores were much lower.
+This result is to be expected: The first two changes were filtered out by the quantization function.
+In other words, the agent does not care whether there are eight, six or ten spawn points, since it only gets the information where the closest asteroid is.
+The same is true for the variation of the screen size.
+In contrast, changing the ship's speed had a detrimental effect: 
+The agent had learned which action would lead to which following state.
+With an increased ship speed the actions would not lead to the states they used to lead to, rendering a lot of knowledge void.
+
 \subsection{Justification}
 % In this section, your model’s final solution and its results should be compared to the benchmark you established earlier in the project using some type of statistical analysis.
 % You should also justify whether these results and the solution are significant enough to have solved the problem posed in the project. Questions to ask yourself when writing this section:
@@ -360,29 +409,81 @@ In the following chapter we will discuss how the different ways of sensing the e
 % Are the final results found stronger than the benchmark result reported earlier?
 % Have you thoroughly analyzed and discussed the final solution?
 % Is the final solution significant enough to have solved the problem?
+
+As explained above, we had two benchmarks to compare the performa nce of the agent to: Human players and a random agent.
+Two human players - one versed in computer games and one not so much - played the game for five runs each.
+The first player achieved an average score of $89352$ points with a standard deviation of $9236$. The lowest score was $76123$ and the highest $101473$.
+The second player achieved an average score of $32540$ points with a standard deviation of $16699$. The lowest score was $6918$ and the highest $49023$.
+
+The random agent played 100 games and achieved an average score of $872$ with a standard deviation of $435$. The lowest score was $0$ and the highest $2863$.
+
+The best performing RL agent on the other hand exceeded expectations by far: During the 100 test runs it got an average score 116042 points.
+However, the standard deviation being 71380, the minimum score only 7541 and the maximum score 420518 indicates that it could still do a lot better.
+
+Remarkably, among the ten agents that performed best, the only constant was the method they chose for state space quantization: It was always the second one, disregarding HP and lives even though it the agent could have made use of that.
+
+There is no agent in the dataset that trained without the punishment for being far away from the most dangerous asteroid. 
+However, during development this was the change that lead to the most significant improvement in performance.
+
+The entire data is included in the repository of this work. If you want to retrace the steps taken here, make sure the database \texttt{asteroids.db3} is in the subfolder \texttt{ReinforcementLearningTraining} of your build folder and the testing frontend will load the data as needed.
+You can browse the database using an SQLite viewer, choose a \texttt{test\_cases\_id} and start the testing algorithm with that ID as parameter.
+It will load the appropriate states and play the game 100 times. If you don't specify an ID, it will load all the test cases.
+
 \section{Conclusion}
 % (approx. 1-2 pages)
 
 \subsection{Free-Form Visualization}
-% In this section, you will need to provide some form of visualization that emphasizes an important quality about the project. It is much more free-form, but should reasonably support a significant result or characteristic about the problem that you want to discuss. Questions to ask yourself when writing this section:
+% In this section, you will need to provide some form of visualization that emphasizes an important quality about the project.
+% It is much more free-form, but should reasonably support a significant result or characteristic about the problem that you want to discuss. Questions to ask yourself when writing this section:
 
 % Have you visualized a relevant or important quality about the problem, dataset, input data, or results?
 % Is the visualization thoroughly analyzed and discussed?
 % If a plot is provided, are the axes, title, and datum clearly defined?
+As mentioned before: This is an algorithm that was trained to play a game.
+Hence, it is best if the reader did the visualization on her own:
+Build the game and start the frontend \texttt{AsteroidsGUI} with the parameter \texttt{406} (after placing the database in the appropriate folder as described above).
+This will load the best performing agent which will thereafter play the game once.
+As you can see, the agent has learned that is is beneficial to hover towards the asteroid that is closest to the lower edge and still reachable.
+Furthermore, it will not crash into other asteroids if they are on the way to the most dangerous asteroid and it will also shoot down other targets in its path.
+
+If you have any trouble getting this to work, please feel free to contact me.
 \subsection{Reflection}
-% In this section, you will summarize the entire end-to-end problem solution and discuss one or two particular aspects of the project you found interesting or difficult. You are expected to reflect on the project as a whole to show that you have a firm understanding of the entire process employed in your work. Questions to ask yourself when writing this section:
+% In this section, you will summarize the entire end-to-end problem solution and discuss one or two particular aspects of the project you found interesting or difficult.
+% You are expected to reflect on the project as a whole to show that you have a firm understanding of the entire process employed in your work. Questions to ask yourself when writing this section:
 
 % Have you thoroughly summarized the entire process you used for this project?
 % Were there any interesting aspects of the project?
 % Were there any difficult aspects of the project?
 % Does the final model and solution fit your expectations for the problem, and should it be used in a general setting to solve these types of problems?
+In this work we presented an algorithm that is able to learn how to play a game that was initially intended to be played by humans exclusively.
+The goal was to let a machine learning algorith figure out how to achieve a score as high as possibe without giving it too much information, because every information a developer can come up with would introduce some bias.
+This worked ato some extent: The state space was shrunk in a reasonable way whcih even made the agent robust to changes in the environment.
+Hoewever, the best performance was only reached after a crucial piece of information was deduced from the game state: The position of the most dangerous asteroid, meaning the asteroid that is closest to the lower edge o the screen, still reachable by the ship and not yet targeted by a shot.
+Only after the agent was punished for being too far away from this asteroid did it reach human levels of performance.
+
+For me, personally, that was an important realization about reinforcement learning: The agent will only do things if it has incentive to do them.
+The initial setup woudl only give the agent \emph{very} sparse rewards. Sometimes, it took $60$ frames until a shot reach an asteroid. 
+It it very hard for a reinforcement learning algorithm to deduce which action actually lead to the reward so many frames later.
+The introduction of the punishemnd described above changed the rewards from being sparse to dense: Every frame the agent would get information on how well it is performing and since the position of the most dangerous asteroid relative to the ship was part of the state space, it was able to figure out that being in front of the most dangerous asteroid is very beneficial.
+
+The final model exceeds my expectations. I am very happy with what the algorithm can do, because it plays better than I can.
+But of course, there is still some room for improvement.
 \subsection{Improvement}
 % In this section, you will need to provide discussion as to how one aspect of the implementation you designed could be improved. As an example, consider ways your implementation can be made more general, and what would need to be modified. You do not need to make this improvement, but the potential solutions resulting from these changes are considered and compared/contrasted to your current solution. Questions to ask yourself when writing this section:
 
 % Are there further improvements that could be made on the algorithms or techniques you used in this project?
 % Were there algorithms or techniques you researched that you did not know how to implement, but would consider using if you knew how?
 % If you used your final solution as the new benchmark, do you think an even better solution exists?
+If you observe how even the best performing agent plays, you will see that it sometimes misses a shot or does not reach an asteroid it is pursuing.
 
+Missing a shot happens, because the agent only knows about the most dangerous asteroid.
+It has no knowledge about any other target. The only thing it learned is that shooting is beneficial regardless of state\footnote{A rather grim lesson to take away from this project, if you ask me...}.
+Performance could probably be improved by telling the agent whether there is an asteroid in front of it.
+
+The second mistake happens, because the agent is not - yet? - able to plan ahead: It will pursue the most dangerous asteroid no matter what. If there is an asteroid in the way, it will wait until that has passed.
+This behaviour makes it lose time and eventually unable to reach the target it was aiming at.
+
+The agent could therefore be improved with more knowledge about the state space and probably longer training runs to make the result more stable.
 
 
 \bibliographystyle{plain}
