@@ -110,6 +110,11 @@ It will start with an initial guess at the optimal policy and slowly improve its
 % Have you provided reasonable justification for the metrics chosen based on the problem and solution?
 In contrast to supervised learning problems where you can easily measure the performance using precision, recall, or F-scores, the performance of the proposed algorithm is only measurable using feature offered by the application domain.
 Since the task of the algorithm is to maximize the score, that is the measurement we are going to use.
+
+The score starts at $0$ and increases every time the player shoots down an asteroid.
+The increase depends on the asteroid's position: The further it is away from the player in y-direction the higher it is.
+Shooting down an asteroid therefore yields between $64$\footnote{Because it is not possible for the ship and an asteroid to overlap and the ship is 64 pixels high.} and $600$ points.
+
 The algorithm will first train by playing the game until it has explored the state space sufficiently and has exploited the gained knowledge to optimize the policy.
 To make the analysis of the performance statistically sounder, the algorithm will then be tested $100$ times and we will take note of the minimum and maximum score as well as the mean and standard deviation.
 \section{Analysis}
@@ -175,6 +180,22 @@ This leads to a total size of the state space of $7\cdot101\cdot1638400\cdot753\
 Obviously, this is much too big to be handled in a project of this scope, making it crucial to find a way to reduce the size of the state space without losing too much information or biasing the algorithm.
 How this is achieved will be explained in the chapter \nameref{datapreprocessing}.
 
+In addition to the state, the agent also has access to two further kinds of data: The reward it gets from the environment and the actions it can take in a given state.
+
+The reward is not to be confused with the points the player gets for shooting down an asteroid: This increase in score can serve as a reward, but it is not necessarily the only feedback the player gets.
+Furthermore, it does not even have to included in the reward at all: the player's task is to maximize the score.
+Incentivizing it to hit targets seems to be a good way to achieve this goal.
+But it is also possible that the agent learns to maximize the score by learning to stay alive.
+The longer it stays alive, the higher the score is. 
+Thus, the agent will get punished when losing a life, the space station getting hit and losing the game. 
+These rewards and punishments served as a good starting points as explained in the chapter Refinement and were later expanded by another reward.
+The exact values can be found in the chapter \nameref{modeleval}.
+
+The possible actions in a state are straight forward to explain: The player can either shoot, move right or move left.
+If the player is not on the right border, it can move right.
+The same is true for moving left.
+The ship can only shoot after at least half a second has passed since the last shot in order to avoid permanent fire. 
+
 
 \subsection{Exploratory Visualization}
 % In this section, you will need to provide some form of visualization that summarizes or extracts a relevant characteristic or feature about the data. 
@@ -213,7 +234,16 @@ This leads to a transition in the behavior: In the beginning, the agent will exp
 The result will be an agent that has explored a big portion of the state space and can play the game reasonably well, ideally better than a human player.
 
 Early experiments showed that it did not make a big difference whether an on-policy method like SARSA\footnote{\url{https://en.wikipedia.org/wiki/State-action-reward-state-action}} or the off-policy method Q-learning\footnote{\url{https://en.wikipedia.org/wiki/Q-learning}} was used.
-This work will therefore focus on Q-learning.
+This work will therefore focus on Q-learning, a method which aims to solve the problem described in the problem statement.
+In each step, the value, $Q_t$, of an action, $a_t$, the player can take in a state, $s_t$, is updated according to the following formula:
+\[Q_{t+1}(s_t, a_t) \leftarrow Q_t(s_t,a_t)+\alpha\cdot(R_{t+1}+\gamma\cdot\max_a Q_t(s_{t+1},a)-Q_t(s_t, a_t))\]
+
+$Q$ is the value of an action taken in a state. This is what the player will try to maximize over time.
+$\alpha$ is the learning rate between $0$ and $1$. The higher it is, the more the current value will change, as one can easily see in the formula: if it is set to $0$, the term in the parentheses does not have any weight at all and the value does not change.
+If set to $1$ the current value will be completely forgotten.
+$\gamma$ is the discount factor between $0$ and $1$. As explained in the Problem Statement, this factor determines how strongly the future rewards are taken into account. A high gamma makes the agent strive for more long-termin solutions.
+Q-Learning is called an off-policy method, because it always takes the maximum action value from the next state into account even though it might not take that action after moving to that state:
+With a certain probability $\epsilon$ it will take a random action.
 
 In order for the agent to first explore the state space and then increasingly exploit its knowledge, we will implement two different functions for the $\epsilon$-value which determines the likelihood of choosing a random action at every time step:
 One function, $l_\epsilon(t)$, will linearly decrease epsilon with every step, the second, $e_\epsilon(t)$, lowers it exponentially:
@@ -269,15 +299,11 @@ There is more information that can probably be summarized: We will lose a bit of
  \item The player's lives will be put into one bit answering the question: Does the player have more than one life left or not? % 2
 \end{itemize}
 
-% 2*3*3*4*5
-
 This leaves us with a theoretical state space size of $4 \cdot 4 \cdot 8 \cdot 2 \cdot 3 \cdot 2 = 1536$.
 However, some combinations are not possible: For instance, the next asteroid cannot be left of the ship if the ship is at the left border of the screen.
 Also, since the distance between asteroids is 100 pixels, it is not possible to be in a state where moving left or right both would mean crashing into an asteroid.
 
 During evaluation the maximum number of explored states was $360$, which is a reasonable number to handle and train with.
-
-
 
 \subsection{Implementation}
 % In this section, the process for which metrics, algorithms, and techniques that you implemented for the given data will need to be clearly documented. 
@@ -315,6 +341,13 @@ The system was built on an Ubuntu 16.04 machine using the following libraries:
 It can be compiled using \texttt{cmake} and \texttt{make}.
 
 
+
+The coding process was rather straight-forward and no bigger complications were encountered.
+However, the game uses a very old code base from a time in which I only had a few months of coding experience.
+It might have been prudent to start from scratch with the goal of having several different player and renderer implementations in mind, because adding these functionalities to an old code base took a lot of time.
+The way it was carried out now does not make me 100\% happy and the code needs some solid refactoring.
+
+
 \subsection{Refinement}
 % In this section, you will need to discuss the process of improvement you made upon the algorithms and techniques you used in your implementation.
 % For example, adjusting parameters for certain models to acquire improved solutions would fall under the refinement category.
@@ -346,6 +379,7 @@ In the following chapter we will discuss how the different ways of sensing the e
 % (approx. 2-3 pages)
 
 \subsection{Model Evaluation and Validation}
+\label{modeleval}
 % In this section, the final model and any supporting qualities should be evaluated in detail. 
 % It should be clear how the final model was derived and why this model was chosen.
 %In addition, some type of analysis should be used to validate the robustness of this model and its solution, such as manipulating the input data or environment to see how the model’s solution is affected (this is called sensitivity analysis). 
